@@ -19,7 +19,7 @@ from scipy.io import wavfile
 # En cada caso indique tiempo entre muestras, número de muestras y potencia.
 print("###### Ejercicio 1 ######")
 
-fs = 20000
+fs = 50000
 N = 500
 f = 2000
 
@@ -54,7 +54,6 @@ x4 = np.sign(np.sin(2 * np.pi * 2*f * tt)) ##esta es haciendolo con numpy y vien
 #Si yo cambio fs, me cambia el Npulso entonces ahi ya se modifican las muestras que valen 1. 
 T_pulso = 0.01    # 10 ms
 N_pulso = int(T_pulso * fs)
-
 pulso = np.zeros(N)
 pulso[:N_pulso] = 1  # primeras 200 muestras valen 1
 
@@ -196,8 +195,7 @@ else:
 
 
 
-## 4)
-## 4)
+## 4) Bonus
 print("\n")
 
 print("###### Ejercicio 4 ######")
