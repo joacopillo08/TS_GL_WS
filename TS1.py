@@ -59,43 +59,45 @@ pulso = np.zeros(N)
 pulso[:N_pulso] = 1  # primeras 200 muestras valen 1
 
 ## aca empiezan los graficos.
+plt.figure(figsize=(10,12))
+
 plt.figure(1)
-plt.subplot(2,2,1)
+plt.subplot(6,1,1)
 plt.plot(tt, xx)
 plt.xlabel("Tiempo [s]")
 plt.ylabel("Amplitud")
 plt.title("2000 Hz")
 
-plt.subplot(2,2,2)
+plt.subplot(6,1,2)
 plt.plot(tt, x1)
 plt.xlabel("Tiempo [s]")
 plt.ylabel("Amplitud")
 plt.title("2000 Hz + desfasaje")
 
-plt.subplot(2,2,3)
+plt.subplot(6,1,3)
 plt.plot(tt, x2)
 plt.xlabel("Tiempo [s]")
 plt.ylabel("Amplitud")
 plt.title("modulacion")
 
-plt.subplot(2,2,4)
+plt.subplot(6,1,4)
 plt.plot(tt, x3)
 plt.xlabel("Tiempo [s]")
 plt.ylabel("Amplitud")
 plt.title("recortada en el 75% de la amplitud ")
 
-plt.tight_layout()  # ajusta los títulos y ejes
-plt.show()
+#plt.tight_layout()  # ajusta los títulos y ejes
+#plt.show()
 
 
-plt.figure(2)
-plt.subplot(2,1,1)
+#plt.figure(2)
+plt.subplot(6,1,5)
 plt.plot(tt, x4)
 plt.xlabel("Tiempo [s]")
 plt.ylabel("Amplitud")
 plt.title("Funcion cuadrada")
 
-plt.subplot(2,1,2)
+plt.subplot(6,1,6)
 plt.scatter(tt, pulso)
 plt.xlabel("Tiempo [s]")
 plt.ylabel("Amplitud")
@@ -151,44 +153,46 @@ Rxpulso = np.correlate(xx, pulso, mode="full")
 lags = np.arange(-N+1, N)         # retardos en muestras
 lags_time = lags * Ts
 
-plt.figure(3)
-plt.subplot(2,2,1)
+plt.figure(2)
+plt.figure(figsize=(18,18))
+
+plt.subplot(6,1,1)
 plt.plot(lags_time, Rxx)
 plt.title("autocorrelacion")
 plt.xlabel("Retardo [s]")
 plt.ylabel("Rxx")
 
-plt.subplot(2,2,2)
+plt.subplot(6,1,2)
 plt.plot(lags_time, Rx1)
 plt.title("x vs x1")
 plt.xlabel("Retardo [s]")
 plt.ylabel("Rxx")
 
 
-plt.subplot(2,2,3)
+plt.subplot(6,1,3)
 plt.plot(lags_time, Rx2)
 plt.title("x vs x2")
 plt.xlabel("Retardo [s]")
 plt.ylabel("Rxx")
 
-plt.subplot(2,2,4)
+plt.subplot(6,1,4)
 plt.plot(lags_time, Rx3)
 plt.title("x vs x3")
 plt.xlabel("Retardo [s]")
 plt.ylabel("Rxx")
 
-plt.tight_layout()  # ajusta los títulos y ejes
-plt.show()
+#plt.tight_layout()  # ajusta los títulos y ejes
+#plt.show()
 
-plt.figure(4)
+#plt.figure(4)
 
-plt.subplot(2,1,1)
+plt.subplot(6,1,5)
 plt.plot(lags_time, Rx4)
 plt.title("x vs x4")
 plt.xlabel("Retardo [s]")
 plt.ylabel("Rxx")
 
-plt.subplot(2,1,2)
+plt.subplot(6,1,6)
 plt.plot(lags_time, Rxpulso)
 plt.title("x vs pulso")
 plt.xlabel("Retardo [s]")
