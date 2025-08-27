@@ -61,7 +61,7 @@ pulso[:N_pulso] = 1  # primeras 200 muestras valen 1
 ## aca empiezan los graficos.
 plt.figure(figsize=(10,12))
 
-plt.figure(1)
+##plt.figure(1)
 plt.subplot(6,1,1)
 plt.plot(tt, xx)
 plt.xlabel("Tiempo [s]")
@@ -153,8 +153,8 @@ Rxpulso = np.correlate(xx, pulso, mode="full")
 lags = np.arange(-N+1, N)         # retardos en muestras
 lags_time = lags * Ts
 
-plt.figure(2)
-plt.figure(figsize=(18,18))
+##plt.figure(2)
+plt.figure(figsize=(18,22))
 
 plt.subplot(6,1,1)
 plt.plot(lags_time, Rxx)
@@ -233,7 +233,7 @@ tt_wav = np.arange(N_wav) / fs ##Esto lo hago para el tiempo, Cuando divido por 
 
 
 # Graficar señal del wav
-plt.figure(5)
+plt.figure()
 plt.plot(tt_wav, data)
 plt.xlabel("Tiempo [s]")
 plt.ylabel("Amplitud")
