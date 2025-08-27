@@ -22,9 +22,10 @@ print("###### Ejercicio 1 ######")
 fs = 50000
 N = 500
 f = 2000
+Ts = 1/fs
+tt = np.arange(N) * Ts           # vector de tiempo
 
 deltaF = fs/N
-Ts = 1/(N*deltaF)
 def mi_funcion_sen(vmax, dc, f, fase, N, fs):
     Ts = 1/fs
     tt = np.arange(N) * Ts           # vector de tiempo
@@ -53,7 +54,7 @@ x4 = np.sign(np.sin(2 * np.pi * 2*f * tt)) ##esta es haciendolo con numpy y vien
 # como mi N lo tengo fijo en 500. voy a tener 300 muestras que estan en 0. Si yo aumento N por ejemplo, siempre voy a tener fijas 200muestras que valen 1 y las N-200=0.
 #Si yo cambio fs, me cambia el Npulso entonces ahi ya se modifican las muestras que valen 1. 
 T_pulso = 0.01    # 10 ms
-N_pulso = int(T_pulso * fs)
+N_pulso = int(round(T_pulso * fs))
 pulso = np.zeros(N)
 pulso[:N_pulso] = 1  # primeras 200 muestras valen 1
 
@@ -87,7 +88,6 @@ plt.tight_layout()  # ajusta los títulos y ejes
 plt.show()
 
 
-
 plt.figure(2)
 plt.subplot(2,1,1)
 plt.plot(tt, x4)
@@ -111,14 +111,14 @@ potencia_x1 = np.mean(x1**2)
 potencia_x2 = np.mean(x2**2)
 potencia_x3 = np.mean(x3**2)
 potencia_x4 = np.mean(x4**2)
-energia_pulso = np.sum(pulso**2) #aca uso energia porque, Señales no periódicas o de duración finita.
+energia_pulso = np.sum(pulso**2) * Ts #aca uso energia porque, Señales no periódicas o de duración finita. energía en unidades tiempo·amplitud^2
 #aca imprimo esto que piden: En cada caso indique tiempo entre muestras, número de muestras y potencia o energía según corresponda.
-print("Señal principal, Ts: ",fs, " N: ", N, "y potencia promedio:", potencia_xx)
-print("Señal desfada, Ts: ",fs, " N: ", N, "y potencia promedio:", potencia_x1)
-print("Señal modulada, Ts: ",fs, " N: ", N, "y potencia promedio:", potencia_x2)
-print("Señal recortada, Ts: ",fs, " N: ", N, "y potencia promedio:", potencia_x3)
-print("Señal cuadrada, Ts: ",fs, " N: ", N, "y potencia promedio:", potencia_x4)
-print("Señal pulso, Ts: ",fs, " N: ", N, "y energia:", energia_pulso)
+print("Señal principal, Ts: ",Ts, " N: ", N, "y potencia promedio:", potencia_xx)
+print("Señal desfada, Ts: ",Ts, " N: ", N, "y potencia promedio:", potencia_x1)
+print("Señal modulada, Ts: ",Ts, " N: ", N, "y potencia promedio:", potencia_x2)
+print("Señal recortada, Ts: ",Ts, " N: ", N, "y potencia promedio:", potencia_x3)
+print("Señal cuadrada, Ts: ",Ts, " N: ", N, "y potencia promedio:", potencia_x4)
+print("Señal pulso, Ts: ",Ts, " N: ", N, "y energia:", energia_pulso)
 print("\n")
 
 
@@ -148,23 +148,34 @@ Rx3 = np.correlate(xx, x3, mode="full")
 Rx4 = np.correlate(xx, x4, mode="full")
 Rxpulso = np.correlate(xx, pulso, mode="full")
 
+lags = np.arange(-N+1, N)         # retardos en muestras
+lags_time = lags * Ts
+
 plt.figure(3)
 plt.subplot(2,2,1)
-plt.plot(Rxx)
+plt.plot(lags_time, Rxx)
 plt.title("autocorrelacion")
+plt.xlabel("Retardo [s]")
+plt.ylabel("Rxx")
 
 plt.subplot(2,2,2)
-plt.plot(Rx1)
+plt.plot(lags_time, Rx1)
 plt.title("x vs x1")
+plt.xlabel("Retardo [s]")
+plt.ylabel("Rxx")
+
 
 plt.subplot(2,2,3)
-plt.plot(Rx2)
+plt.plot(lags_time, Rx2)
 plt.title("x vs x2")
-
+plt.xlabel("Retardo [s]")
+plt.ylabel("Rxx")
 
 plt.subplot(2,2,4)
-plt.plot(Rx3)
+plt.plot(lags_time, Rx3)
 plt.title("x vs x3")
+plt.xlabel("Retardo [s]")
+plt.ylabel("Rxx")
 
 plt.tight_layout()  # ajusta los títulos y ejes
 plt.show()
@@ -172,12 +183,16 @@ plt.show()
 plt.figure(4)
 
 plt.subplot(2,1,1)
-plt.plot(Rx4)
+plt.plot(lags_time, Rx4)
 plt.title("x vs x4")
+plt.xlabel("Retardo [s]")
+plt.ylabel("Rxx")
 
 plt.subplot(2,1,2)
-plt.plot(Rxpulso)
+plt.plot(lags_time, Rxpulso)
 plt.title("x vs pulso")
+plt.xlabel("Retardo [s]")
+plt.ylabel("Rxx")
 
 plt.tight_layout()  # ajusta los títulos y ejes
 plt.show()
@@ -207,7 +222,6 @@ energia_sonido = np.sum(data**2)
 
 print("Energía del sonido:", energia_sonido)
 print("La fs que me devuelve es:", fs)
-print("La data que me devuelve es:", data)
 
 # Vector de tiempo propio del wav
 N_wav = len(data)
