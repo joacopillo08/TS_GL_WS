@@ -17,7 +17,7 @@ from scipy.io import wavfile
 # Una señal cuadrada de 4kHz.
 # Un pulso rectangular de 10ms.
 # En cada caso indique tiempo entre muestras, número de muestras y potencia.
-print("###### Ejercicio 1 ######")
+#print("###### Ejercicio 1 ######")
 
 fs = 50000
 N = 500
@@ -57,7 +57,7 @@ T_pulso = 0.01    # 10 ms
 N_pulso = int(round(T_pulso * fs))
 pulso = np.zeros(N)
 pulso[:N_pulso] = 1  # primeras 200 muestras valen 1
-
+"""
 ## aca empiezan los graficos.
 plt.figure(figsize=(10,12))
 
@@ -105,6 +105,7 @@ plt.title("Pulso rectangular de 10 ms")
 
 plt.tight_layout()  # ajusta los títulos y ejes
 plt.show()
+"""
 
 ## np.mean(xx**2  saca el promedio de esos valores, para xx,x1,x2,x3,x4 voy a usar la potencia promeido. Porque tienen duración infinita (si la extendiera en el tiempo), y su energía sería infinita.
 # np.mean hace 1/N * sumatoria desde n=1 hasta N de x**2
@@ -115,6 +116,7 @@ potencia_x3 = np.mean(x3**2)
 potencia_x4 = np.mean(x4**2)
 energia_pulso = np.sum(pulso**2) * Ts #aca uso energia porque, Señales no periódicas o de duración finita. energía en unidades tiempo·amplitud^2
 #aca imprimo esto que piden: En cada caso indique tiempo entre muestras, número de muestras y potencia o energía según corresponda.
+"""
 print("Señal principal, Ts: ",Ts, " N: ", N, "y potencia promedio:", potencia_xx)
 print("Señal desfada, Ts: ",Ts, " N: ", N, "y potencia promedio:", potencia_x1)
 print("Señal modulada, Ts: ",Ts, " N: ", N, "y potencia promedio:", potencia_x2)
@@ -122,7 +124,7 @@ print("Señal recortada, Ts: ",Ts, " N: ", N, "y potencia promedio:", potencia_x
 print("Señal cuadrada, Ts: ",Ts, " N: ", N, "y potencia promedio:", potencia_x4)
 print("Señal pulso, Ts: ",Ts, " N: ", N, "y energia:", energia_pulso)
 print("\n")
-
+"""
 
 
 ##2) ortogonalidad
@@ -131,7 +133,7 @@ def fun_ortogonalidad(x, y):
     numerador = np.sum(x*y) ##aca ya sabe que el vector tiene N elementos, entonces suma desde n=0 hasta N-1.
     denominador = np.sqrt(np.sum(x**2)) * np.sqrt(np.sum(y**2)) # aca normalizo cada señal
     return numerador/denominador
-
+"""
 print("###### Ejercicio 2 ######")
 
 print("señal principal vs x1 (desfasada pi/2):", fun_ortogonalidad(xx, x1))
@@ -140,7 +142,7 @@ print("señal principal vs x3 (clipeada en amplitud):", fun_ortogonalidad(xx, x3
 print("señal principal vs x4 (cuadrada de 4kHz):", fun_ortogonalidad(xx, x4))
 print("señal principal vs pulso:", fun_ortogonalidad(xx, pulso))
 print("\n")
-
+"""
 #3)  3) Graficar la autocorrelación de la primera señal y la correlación entre ésta y las demás.
     
 Rxx = np.correlate(xx, xx, mode="full")
@@ -152,7 +154,7 @@ Rxpulso = np.correlate(xx, pulso, mode="full")
 
 lags = np.arange(-N+1, N)         # retardos en muestras
 lags_time = lags * Ts
-
+"""
 ##plt.figure(2)
 plt.figure(figsize=(18,22))
 
@@ -211,9 +213,9 @@ if np.allclose(igualdad, 0, atol=1e-12):
     print("La propiedad se cumple para cualquier frecuencia")
 else:
     print("No se cumple la propiedad")
+"""
 
-
-
+"""
 ## 4) Bonus
 print("\n")
 
@@ -239,4 +241,4 @@ plt.xlabel("Tiempo [s]")
 plt.ylabel("Amplitud")
 plt.title("Señal del archivo WAV")
 plt.show()
-
+"""

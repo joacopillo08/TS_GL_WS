@@ -33,7 +33,7 @@ freqs = np.fft.fftfreq(N, Ts)   # eje de frecuencias en Hz
 
 # grilla temporal
 
-tiempo, x1 = mi_funcion_sen(A0 = 1, offset = 0, fx = 1, phase = 0, nn = N, fs = fs)
+tiempo, x1 = mi_funcion_sen(A0 = 1, offset = 0, fx = 2, phase = 0, nn = N, fs = fs)
 tiempo, x2 = mi_funcion_sen(A0 = 1, offset = 0, fx = fs/4 * deltaF, phase = 0, nn = N, fs = fs)
 tiempo, x3 = mi_funcion_sen(A0 = 1, offset = 0, fx = ((fs/4) + 1) * deltaF, phase = 0, nn = N, fs = fs)
 tiempo, x4 = mi_funcion_sen(A0 = 1, offset = 0, fx = ((fs/4) + 0.1) * deltaF, phase = 0, nn = N, fs = fs)
@@ -61,7 +61,7 @@ plt.figure()
 plt.scatter(freqs[:N//2], X1abs[:N//2])
 plt.scatter(freqs[:N//2], X2abs[:N//2])
 plt.scatter(freqs[:N//2], X3abs[:N//2])
-plt.scatter(freqs[:N//2], X4abs[:N//2])
+#plt.scatter(freqs[:N//2], X4abs[:N//2])
 
 plt.title("FFT")
 plt.xlabel("Frecuencia [Hz]")
