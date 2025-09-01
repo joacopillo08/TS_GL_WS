@@ -63,9 +63,9 @@ delta = np.zeros(N)
 delta[0] = 1
 
 h = en_diferencias(N = N, x = delta)
-y_conv = np.convolve(TS1.x1, h)[:N] 
+y_conv = np.convolve(TS1.xx, h)[:N] 
 
-plt.figure(2)
+plt.figure(1)
 plt.plot(tt, y_conv, "--",color='red' , label="y conv")
 plt.legend()
 
@@ -73,5 +73,81 @@ plt.xlabel("Tiempo [s]")
 plt.ylabel("Amplitud")
 plt.title("2 Hz")
 plt.show()
+
+#------------------------------------
+"""
+2) Hallar la respuesta al impulso y la salida correspondiente a una señal de entrada senoidal en los sistemas definidos mediante las siguientes ecuaciones en diferencias:
+
+y[n]=x[n]+3⋅x[n−10]
+y[n]=x[n]+3⋅y[n−10]
+
+"""
+
+def en_diferencias2(N,x):
+    y2 = np.zeros(N)
+    for n in range (N):
+        x0 = x[n]
+        x10 = x[n-10] if n-10 >= 0 else 0
+        y2[n]=x0+3*x10
+    return y2
+
+def en_diferencias3(N,x):
+    y3 = np.zeros(N)
+    for n in range (N):
+        x0 = x[n]
+        y10 = y3[n-10] if n-10 >= 0 else 0
+        y3[n]=x0+3*y10
+    return y3
+
+y2 = en_diferencias2(N = len(TS1.xx), x = TS1.xx)
+h2 = en_diferencias2(N = N, x = delta)
+y_conv2 = np.convolve(TS1.xx, h2)[:N] 
+
+plt.figure()
+plt.plot(tt, y_conv2, "o",color='green' , label="y conv")
+plt.plot(tt, y2, label="y salida")
+plt.legend()
+plt.xlabel("Tiempo [s]")
+plt.ylabel("Amplitud")
+plt.title("2 Hz")
+plt.show()
+
+y3 = en_diferencias3(N = len(TS1.xx), x = TS1.xx)
+h3 = en_diferencias3(N = N, x = delta)
+y_conv3 = np.convolve(TS1.xx, h3)[:N] 
+
+plt.figure()
+plt.plot(tt, y_conv3, "o",color='green' , label="y conv")
+plt.plot(tt, y3, label="y salida")
+plt.legend()
+plt.xlabel("Tiempo [s]")
+plt.ylabel("Amplitud")
+plt.title("2 Hz")
+plt.show()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
