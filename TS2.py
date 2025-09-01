@@ -11,6 +11,14 @@ import scipy
 from scipy.signal import lfilter
 import TS1
 
+
+
+# =============================================================================
+# Ejercicio 1
+# HECHO --> Graficar la señal de salida para cada una de las señales de entrada que generó en el TS1. Considere que las mismas son causales.
+# HECHO --> Hallar la respuesta al impulso y usando la misma, repetir la generación de la señal de salida para alguna de las señales de entrada consideradas en el punto anterior.
+# En cada caso indique la frecuencia de muestreo, el tiempo de simulación y la potencia o energía de la señal de salida.
+# =============================================================================
 fs = 1000
 N = 500
 f = 2
@@ -55,10 +63,10 @@ delta = np.zeros(N)
 delta[0] = 1
 
 h = en_diferencias(N = N, x = delta)
-y_conv = np.convolve(TS1.x4, h)[:N] 
+y_conv = np.convolve(TS1.x1, h)[:N] 
 
-plt.figure(5)
-plt.plot(tt, y_conv, "--",color='orange' , label="y conv")
+plt.figure(2)
+plt.plot(tt, y_conv, "--",color='red' , label="y conv")
 plt.legend()
 
 plt.xlabel("Tiempo [s]")
