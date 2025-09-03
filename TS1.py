@@ -9,6 +9,7 @@ import numpy as np
 import scipy 
 from scipy import signal
 from scipy.io import wavfile
+from scipy.signal import correlate, correlation_lags
 
 # Una señal sinusoidal de 2KHz.
 # Misma señal amplificada y desfazada en π/2.
@@ -57,7 +58,7 @@ T_pulso = 0.01    # 10 ms
 N_pulso = int(round(T_pulso * fs))
 pulso = np.zeros(N)
 pulso[:N_pulso] = 1  # primeras 200 muestras valen 1
-"""
+#"""
 ## aca empiezan los graficos.
 plt.figure(figsize=(10,12))
 
@@ -105,7 +106,7 @@ plt.title("Pulso rectangular de 10 ms")
 
 plt.tight_layout()  # ajusta los títulos y ejes
 plt.show()
-"""
+#"""
 
 ## np.mean(xx**2  saca el promedio de esos valores, para xx,x1,x2,x3,x4 voy a usar la potencia promeido. Porque tienen duración infinita (si la extendiera en el tiempo), y su energía sería infinita.
 # np.mean hace 1/N * sumatoria desde n=1 hasta N de x**2
@@ -133,7 +134,7 @@ def fun_ortogonalidad(x, y):
     numerador = np.sum(x*y) ##aca ya sabe que el vector tiene N elementos, entonces suma desde n=0 hasta N-1.
     denominador = np.sqrt(np.sum(x**2)) * np.sqrt(np.sum(y**2)) # aca normalizo cada señal
     return numerador/denominador
-"""
+#"""
 print("###### Ejercicio 2 ######")
 
 print("señal principal vs x1 (desfasada pi/2):", fun_ortogonalidad(xx, x1))
@@ -142,19 +143,22 @@ print("señal principal vs x3 (clipeada en amplitud):", fun_ortogonalidad(xx, x3
 print("señal principal vs x4 (cuadrada de 4kHz):", fun_ortogonalidad(xx, x4))
 print("señal principal vs pulso:", fun_ortogonalidad(xx, pulso))
 print("\n")
-"""
+#"""
 #3)  3) Graficar la autocorrelación de la primera señal y la correlación entre ésta y las demás.
     
-Rxx = np.correlate(xx, xx, mode="full")
-Rx1 = np.correlate(xx, x1, mode="full")
-Rx2 = np.correlate(xx, x2, mode="full")
-Rx3 = np.correlate(xx, x3, mode="full")
-Rx4 = np.correlate(xx, x4, mode="full")
-Rxpulso = np.correlate(xx, pulso, mode="full")
+Rxx = correlate(xx, xx, mode="full")
+Rx1 = correlate(xx, x1, mode="full")
+Rx2 = correlate(xx, x2, mode="full")
+Rx3 = correlate(xx, x3, mode="full")
+#Rx4 = np.correlate(xx, x4, mode="full")
+#Rxpulso = np.correlate(xx, pulso, mode="full")
+Rx4 = correlate(xx, x4, mode="full")
+Rxpulso = correlate(xx, pulso, mode="full")
 
-lags = np.arange(-N+1, N)         # retardos en muestras
+
+lags = correlation_lags(len(xx), len(xx), mode="full")
 lags_time = lags * Ts
-"""
+#"""
 ##plt.figure(2)
 plt.figure(figsize=(18,22))
 
@@ -207,15 +211,24 @@ plt.show()
 print("###### Ejercicio 3 ######")
 
 w = 2 * np.pi * f
+w1 = 2 * w
+w2 = 0
 igualdad = 2*np.sin(w*tt)*np.sin(w*tt/2)-np.cos(w*tt/2)+np.cos(w*tt*3/2)
+igualdad1 = 2*np.sin(w1*tt)*np.sin(w1*tt/2)-np.cos(w1*tt/2)+np.cos(w1*tt*3/2)
+igualdad2 = 2*np.sin(w2*tt)*np.sin(w2*tt/2)-np.cos(w2*tt/2)+np.cos(w2*tt*3/2)
 
-if np.allclose(igualdad, 0, atol=1e-12):
+
+print("Aca demuestro la identidad trigonometrica")
+
+if np.allclose([igualdad1, igualdad2, igualdad], 0, atol=1e-12):
+    print("Son (casi) todos cero")
     print("La propiedad se cumple para cualquier frecuencia")
 else:
     print("No se cumple la propiedad")
-"""
+    
+#"""
 
-"""
+#"""
 ## 4) Bonus
 print("\n")
 
@@ -241,4 +254,4 @@ plt.xlabel("Tiempo [s]")
 plt.ylabel("Amplitud")
 plt.title("Señal del archivo WAV")
 plt.show()
-"""
+#"""
