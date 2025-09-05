@@ -10,7 +10,6 @@ Created on Thu Aug 28 18:57:47 2025
 """
 Created on Wed Aug 27 21:08:55 2025
 
-@author: milenawaichnan
 """
 
 import numpy as np
@@ -58,9 +57,9 @@ X4ang = np.angle(X4)
 # Graficar solo hasta N/2
 plt.figure()
 
-plt.scatter(freqs[:N//2], X1abs[:N//2])
-plt.scatter(freqs[:N//2], X2abs[:N//2])
-plt.scatter(freqs[:N//2], X3abs[:N//2])
+#plt.scatter(freqs[:N//2], X1abs[:N//2])
+#plt.scatter(freqs[:N//2], X2abs[:N//2])
+#plt.scatter(freqs[:N//2], X3abs[:N//2])
 #plt.scatter(freqs[:N//2], X4abs[:N//2])
 
 plt.title("FFT")
@@ -70,40 +69,59 @@ plt.grid(True)
 
 
 plt.plot(freqs, np.log10(X2abs) * 20, 'x', label = 'X2 abs dB')
-plt.plot(freqs, np.log10(X3abs) * 20, 'x', label = 'X3 abs dB')
-plt.plot(freqs, np.log10(X4abs) * 20, 'x', label = 'X4 abs dB')
+#plt.plot(freqs, np.log10(X3abs) * 20, 'x', label = 'X3 abs dB')
+
+#plt.plot(freqs, np.log10(X4abs) * 20, 'x', label = 'X4 abs dB')
 
 plt.legend()
 plt.show()
 
-# =============================================================================
-# ejercicio nuevo clase 28/08
-# =============================================================================
-#Punto 1 de la varianza
+#%%
 
-_, x5 = mi_funcion_sen(A0 = np.sqrt(2), offset = 0, fx = fs/4 * deltaF, phase = 0, nn = N, fs = fs)
-X5 = fft(x5)
-X5abs = np.abs(X5)
-X5ang = np.angle(X5)
+varianza = np.var(x2)
+print(varianza)
 
 
-var_x5 = np.var(x5)
-print("Varianza:", var_x5)
+modulo_cuadrado = np.abs(X2) ** 2
+#moduloDB = 10 * np.log10(modulo_cuadrado)
 
-#Punto 2 del modulo cuadrado, uso X2 porque necesito que este en frecuencia 
-modulo_cuadrado = np.abs(X5)**2  
-plt.figure()
-plt.plot(freqs, 10 * np.log10(modulo_cuadrado), 'x', label='X5 |X|^2 dB')
-
+plt.figure(2)
+plt.plot(freqs, np.log10(modulo_cuadrado) * 10, 'x', label = 'X1 abs dB')
+plt.legend()
 
 
 sumaModulo = np.sum(modulo_cuadrado)
-sumaCuadrado = np.sum(x5 ** 2)
+sumaCuadrado = np.sum(np.abs(X2) ** 2)
 
 if sumaModulo == sumaCuadrado:
     print("Se cumple Parseval")
 else: 
-    print("No se cumple Parseval")
+    print("No se cumple Parseval")
+    
 
+##Zero padding
+
+#zeroPadding = np.zeros(100 * N)
+zeroPadding1 = np.zeros(10 * N)
+#zeroPadding1[9000:10000] = x2 #x1 x1 x1 x1  0 0 0 0 0 0 0 0
+zeroPadding1[0:N] = x2 #x1 x1 x1 x1  0 0 0 0 0 0 0 0
+
+#fft_zeroPadding = fft(zeroPadding)
+fft_zeroPadding1 = fft(zeroPadding1)
+
+
+
+#freqs = np.arange(100 * N) * deltaF
+freqs1 = np.arange(10 * N) * deltaF
+
+#freq1 = np.abs(fft_zeroPadding) ** 2
+
+
+plt.figure()
+#plt.plot(freqs, np.log10(fft_zeroPadding)*10, '--',label = 'Zero Padding')
+plt.plot(freqs1, np.log10(fft_zeroPadding1)*10, '--',label = 'Zero Padding')
+
+plt.xlim(0, 5*N)
+plt.legend()
 
 
