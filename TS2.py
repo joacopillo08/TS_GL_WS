@@ -1,17 +1,50 @@
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri Aug 29 13:35:21 2025
+Created on Fri Sep  5 22:46:57 2025
 
-@author: JGL
+@author: joacomillo12
 """
 
-import matplotlib.pyplot as plt
 import numpy as np
-import scipy 
+import matplotlib.pyplot as plt
 from scipy.signal import lfilter
-import TS1
 
+from scipy import signal
 
+#Aca uso todo lo mismo que en la ts1. Tambien podria importar el archivo pero se le va a complicar a los profes.
+fs = 50000
+N = 500
+f = 2000
+Ts = 1/fs
+tt = np.arange(N) * Ts           # vector de tiempo
+
+deltaF = fs/N
+def mi_funcion_sen(vmax, dc, f, fase, N, fs):
+    Ts = 1/fs
+    tt = np.arange(N) * Ts           # vector de tiempo
+    xx = dc + vmax * np.sin(2* np.pi * f * tt + fase)  # señal senoidal
+    return tt, xx
+
+def modulacion(vmax, dc, f, fase, N, fs):
+    tt, xx = mi_funcion_sen(vmax=1, dc=0, f=f, fase=0, N = N, fs=fs)
+    tt, x1 = mi_funcion_sen(vmax=1, dc=0, f=f/2, fase=0, N = N, fs=fs)
+    x2 = xx * x1
+    return x2
+
+tt, xx = mi_funcion_sen(vmax=1, dc=0, f=f, fase=0, N = N, fs=fs)
+tt, x1 = mi_funcion_sen(vmax=1, dc=0, f=f, fase=np.pi/2, N = N, fs=fs)
+x2 = modulacion(vmax=1, dc=0, f=f, fase=0, N = N, fs=fs)
+x3 = np.clip(xx,-0.75,0.75,out=None)
+x4 = signal.square(2*np.pi*4000*tt, duty=0.5)
+x4 = x4 - np.mean(x4)
+print("mean x4:", np.mean(x4))      # ~ 0.0
+print("sum x4:", np.sum(x4))        # ~ 0
+
+T_pulso = 0.01    # 10 ms
+N_pulso = int(round(T_pulso * fs))
+pulso = np.zeros(N)
+pulso[:N_pulso] = 1  # primeras 200 muestras valen 1
 
 # =============================================================================
 # Ejercicio 1
@@ -19,14 +52,6 @@ import TS1
 # HECHO --> Hallar la respuesta al impulso y usando la misma, repetir la generación de la señal de salida para alguna de las señales de entrada consideradas en el punto anterior.
 # En cada caso indique la frecuencia de muestreo, el tiempo de simulación y la potencia o energía de la señal de salida.
 # =============================================================================
-fs = 1000
-N = 500
-f = 2
-Ts = 1/fs
-tt = np.arange(N) * Ts          
-deltaF = fs/N
-Ts = 1/fs
-tt = np.arange(len(TS1.xx)) * Ts
 
 def en_diferencias(N,x):
     y = np.zeros(N)
@@ -39,108 +64,92 @@ def en_diferencias(N,x):
         y[n] = 3* 10**(-2)*x0 + 5 * 10**(-2)*x1 +  3 * 10**(-2)*x2 + 1.5*y1-0.5*y2
     return y
 
-def plot_salida(x, nombre):
-    y = en_diferencias(N = len(x), x = x)
-    tt = np.arange(len(x)) * Ts
-    plt.figure()
-    plt.plot(tt, y, label="y salida")
-    plt.plot(tt, x,color='green', label="x entrada")
-    plt.legend()
-    plt.xlabel("Tiempo [s]")
-    plt.ylabel("Amplitud")
-    plt.title(f"Respuesta a {nombre}")
-    plt.show()
+entradas = [
+    (xx,   "Seno principal"),
+    (x1,   "Seno desf. π/2"),
+    (x2,   "AM (f/2)"),
+    (x3,   "AM clipeada 75%"),
+    (x4,   "Cuadrada 4 kHz"),
+    (pulso,"Pulso 10 ms"),
+]
 
-plot_salida(TS1.xx, "xx")
-plot_salida(TS1.x1, "x1")
-plot_salida(TS1.x2, "x2")
-plot_salida(TS1.x3, "x3")
-plot_salida(TS1.x4, "x4")
-
-#tt, TS1.xx = TS1.mi_funcion_sen(vmax=1, dc=0, f=f, fase=0, N = N, fs=fs)
-
-delta = np.zeros(N)
+# convolucion de la entrada xx con delta
+delta = np.zeros(len(xx))
 delta[0] = 1
-
 h = en_diferencias(N = N, x = delta)
-y_conv = np.convolve(TS1.xx, h)[:N] 
+y_conv = np.convolve(xx, h)[:N]
 
-plt.figure(1)
-plt.plot(tt, y_conv, "--",color='red' , label="y conv")
-plt.legend()
+fig, axs = plt.subplots(3, 2, figsize=(12, 8), sharex=True)
+axs = axs.ravel()  # aplanar para poder usar axs[i]
 
-plt.xlabel("Tiempo [s]")
-plt.ylabel("Amplitud")
-plt.title("2 Hz")
+for i, (x, nombre) in enumerate(entradas):
+    y = en_diferencias(len(x), x)
+    t = np.arange(len(x)) * Ts
+
+    ax = axs[i]
+    ax.plot(t, y, label="Salida", linewidth=1.5)
+    ax.plot(t, x, '--', label="Entrada", linewidth=1.0)
+    if i == 0:  # primer subplot corresponde a xx
+        ax.plot(t, y_conv, linestyle='none', marker='o', markersize=2.5,
+                label="h*xx (convolución)")
+
+    ax.set_title(nombre)
+    ax.grid(True, alpha=0.3)
+    ax.legend(fontsize=9, framealpha=0.9)
+
+fig.supxlabel("Tiempo [s]")
+fig.supylabel("Amplitud")
+fig.tight_layout()
 plt.show()
 
-#------------------------------------
-"""
-2) Hallar la respuesta al impulso y la salida correspondiente a una señal de entrada senoidal en los sistemas definidos mediante las siguientes ecuaciones en diferencias:
+#%%
+# =========================
+# Ejercicio 2
+# =========================
+# Sistema A (FIR): y[n] = x[n] + 3 x[n-10]
 
-y[n]=x[n]+3⋅x[n−10]
-y[n]=x[n]+3⋅y[n−10]
+b2 = np.zeros(11)
+b2[0] = 1.0
+b2[10] = 3.0
+a2 = np.array([1.0])
+y2  = lfilter(b2, a2, xx)
 
-"""
+delta = np.zeros(len(xx))
+delta[0] = 1
+h2  = lfilter(b2, a2, delta)               
+y2_conv = np.convolve(xx, h2, mode='full')[:N]  # causal
+#y2_conv = y2_conv1[:len(xx)]  
 
-def en_diferencias2(N,x):
-    y2 = np.zeros(N)
-    for n in range (N):
-        x0 = x[n]
-        x10 = x[n-10] if n-10 >= 0 else 0
-        y2[n]=x0+3*x10
-    return y2
 
-def en_diferencias3(N,x):
-    y3 = np.zeros(N)
-    for n in range (N):
-        x0 = x[n]
-        y10 = y3[n-10] if n-10 >= 0 else 0
-        y3[n]=x0+3*y10
-    return y3
-
-y2 = en_diferencias2(N = len(TS1.xx), x = TS1.xx)
-h2 = en_diferencias2(N = N, x = delta)
-y_conv2 = np.convolve(TS1.xx, h2)[:N] 
-
-plt.figure()
-plt.plot(tt, y_conv2, "o",color='green' , label="y conv")
-plt.plot(tt, y2, label="y salida")
-plt.legend()
-plt.xlabel("Tiempo [s]")
-plt.ylabel("Amplitud")
-plt.title("2 Hz")
+plt.figure(figsize=(10,4))
+plt.plot(tt, y2, '--', label="y (lfilter)", linewidth=1.5)
+plt.plot(tt, y2_conv, linestyle='none', marker='o', markersize=2.5, label="y (conv con h2)")
+plt.xlabel("Tiempo [s]"); plt.ylabel("Amplitud")
+plt.title("Sistema A (FIR): y[n] = x[n] + 3·x[n−10]")
+plt.grid(True, alpha=0.3); plt.legend(); plt.tight_layout()
 plt.show()
 
-y3 = en_diferencias3(N = len(TS1.xx), x = TS1.xx)
-h3 = en_diferencias3(N = N, x = delta)
-y_conv3 = np.convolve(TS1.xx, h3)[:N] 
+# Sistema B (IIR): y[n] = x[n] + 3 y[n-10]  (INESTABLE)
 
-plt.figure()
-plt.plot(tt, y_conv3, "o",color='green' , label="y conv")
-plt.plot(tt, y3, label="y salida")
-plt.legend()
-plt.xlabel("Tiempo [s]")
-plt.ylabel("Amplitud")
-plt.title("2 Hz")
+b3 = np.array([1.0])
+a3 = np.zeros(11)
+a3[0]  = 1.0   # y[n]
+a3[10] = -3.0  # -3 y[n-10]
+y3  = lfilter(b3, a3, xx)
+
+h3 = lfilter(b3, a3, delta)     # [1, 0.., 3, 0.., 9, ...] hasta len(xx)
+
+y3_conv = np.convolve(xx, h3, mode='full')[:N]    # mismo largo que xx
+
+# --- Plot comparación --------------------------------------------------------
+
+plt.figure(figsize=(10,4))
+plt.plot(tt, y3, '--', label="y (lfilter IIR)", linewidth=1.5)
+plt.plot(tt, y3_conv, linestyle='none', marker='o', markersize=2.5, label="y (conv con h3 trunc.)")
+plt.xlabel("Tiempo [s]"); plt.ylabel("Amplitud")
+plt.title("Sistema B (IIR, inestable): y[n] = x[n] + 3·y[n−10]")
+plt.grid(True, alpha=0.3); plt.legend(); plt.tight_layout()
 plt.show()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

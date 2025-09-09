@@ -1,11 +1,9 @@
-#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Fri Sep  5 22:48:09 2025
+Created on Wed Aug 20 14:36:27 2025
 
-@author: milenawaichnan
+@author: JGL
 """
-
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy 
@@ -51,11 +49,7 @@ x2 = modulacion(vmax=1, dc=0, f=f, fase=0, N = N, fs=fs)
 x3 = np.clip(xx,-0.75,0.75,out=None)
 
 #x4 = sp.square(2 * np.pi * 2*f * tt) #multiplico f por dos porque me pide 4kHz. Esta es con la funcion de scipy
-#x4 = np.sign(np.sin(2 * np.pi * 2*f * tt)) ##esta es haciendolo con numpy y viendo el signo de la senoidal
-x4 = signal.square(2*np.pi*4000*tt, duty=0.5)
-x4 = x4 - np.mean(x4)
-print("mean x4:", np.mean(x4))      # ~ 0.0
-print("sum x4:", np.sum(x4))        # ~ 0
+x4 = np.sign(np.sin(2 * np.pi * 2*f * tt)) ##esta es haciendolo con numpy y viendo el signo de la senoidal
 
 # aca hago el del puslo. Como Npulso = Tpulso . fs. Voy a tener 200 muestras
 # como mi N lo tengo fijo en 500. voy a tener 300 muestras que estan en 0. Si yo aumento N por ejemplo, siempre voy a tener fijas 200muestras que valen 1 y las N-200=0.
@@ -232,3 +226,32 @@ if np.allclose([igualdad1, igualdad2, igualdad], 0, atol=1e-12):
 else:
     print("No se cumple la propiedad")
     
+#"""
+
+#"""
+## 4) Bonus
+print("\n")
+
+print("###### Ejercicio 4 ######")
+
+fs, data = wavfile.read("lacucaracha.wav")
+
+# Calcular energía
+energia_sonido = np.sum(data**2)
+
+print("Energía del sonido:", energia_sonido)
+print("La fs que me devuelve es:", fs)
+
+# Vector de tiempo propio del wav
+N_wav = len(data)
+tt_wav = np.arange(N_wav) / fs ##Esto lo hago para el tiempo, Cuando divido por fs lo pongo en segundos. 
+
+
+# Graficar señal del wav
+plt.figure()
+plt.plot(tt_wav, data)
+plt.xlabel("Tiempo [s]")
+plt.ylabel("Amplitud")
+plt.title("Señal del archivo WAV")
+plt.show()
+#"""

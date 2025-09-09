@@ -4,9 +4,6 @@ Created on Thu Sep  4 22:54:05 2025
 
 @author: JGL
 """
-
-
-
 #!/usr/bin/env python3
 # -- coding: utf-8 --
 """
@@ -70,11 +67,11 @@ rango = np.abs(freq) <= 2048  # solo los múltiplos de Δf entre -50 y 50
 
 # Gráfico
 plt.figure(figsize=(10,5))
-plt.plot(freq[rango], responseBH[rango], color="red", label='Blackman Harris')
+#plt.plot(freq[rango], responseBH[rango], color="red", label='Blackman Harris')
 plt.plot(freq[rango], responseHamming[rango], color="green", label='Hamming')
 plt.plot(freq[rango], responseHann[rango], color="orange", label='Hann')
 plt.plot(freq[rango], responseRect[rango], color="blue", label='Rectangular')
-plt.plot(freq[rango], responseFT[rango], color="brown", label='Flattop')
+#plt.plot(freq[rango], responseFT[rango], color="brown", label='Flattop')
 plt.legend()
 plt.grid()
 
