@@ -6,6 +6,12 @@ Created on Fri Sep  5 22:48:09 2025
 @author: milenawaichnan
 """
 
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Aug 20 14:36:27 2025
+
+@author: JGL
+"""
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy 
@@ -22,7 +28,7 @@ from scipy.signal import correlate, correlation_lags
 # En cada caso indique tiempo entre muestras, número de muestras y potencia.
 #print("###### Ejercicio 1 ######")
 
-fs = 50000
+fs = 100000
 N = 500
 f = 2000
 Ts = 1/fs
@@ -50,8 +56,6 @@ x2 = modulacion(vmax=1, dc=0, f=f, fase=0, N = N, fs=fs)
 #Forma de hacer el clipeo para recortar la amplitud de la señal. 
 x3 = np.clip(xx,-0.75,0.75,out=None)
 
-#x4 = sp.square(2 * np.pi * 2*f * tt) #multiplico f por dos porque me pide 4kHz. Esta es con la funcion de scipy
-#x4 = np.sign(np.sin(2 * np.pi * 2*f * tt)) ##esta es haciendolo con numpy y viendo el signo de la senoidal
 x4 = signal.square(2*np.pi*4000*tt, duty=0.5)
 x4 = x4 - np.mean(x4)
 print("mean x4:", np.mean(x4))      # ~ 0.0
@@ -60,11 +64,14 @@ print("sum x4:", np.sum(x4))        # ~ 0
 # aca hago el del puslo. Como Npulso = Tpulso . fs. Voy a tener 200 muestras
 # como mi N lo tengo fijo en 500. voy a tener 300 muestras que estan en 0. Si yo aumento N por ejemplo, siempre voy a tener fijas 200muestras que valen 1 y las N-200=0.
 #Si yo cambio fs, me cambia el Npulso entonces ahi ya se modifican las muestras que valen 1. 
-T_pulso = 0.01    # 10 ms
-N_pulso = int(round(T_pulso * fs))
-pulso = np.zeros(N)
-pulso[:N_pulso] = 1  # primeras 200 muestras valen 1
-#"""
+T_pulso = 0.01    # 10 ms 
+N_pulso = int(T_pulso * fs)  # 500 muestras
+
+N1 = 2000   # señal total de 40 ms
+pulso = np.zeros(N1)
+pulso[:N_pulso] = 1
+tt_pulso = np.arange(N1) * Ts   # vector de tiempo consistente con N
+
 ## aca empiezan los graficos.
 plt.figure(figsize=(10,12))
 
@@ -74,42 +81,44 @@ plt.plot(tt, xx)
 plt.xlabel("Tiempo [s]")
 plt.ylabel("Amplitud")
 plt.title("2000 Hz")
+plt.grid(True)
 
 plt.subplot(6,1,2)
 plt.plot(tt, x1)
 plt.xlabel("Tiempo [s]")
 plt.ylabel("Amplitud")
 plt.title("2000 Hz + desfasaje")
-
+plt.grid(True)
 plt.subplot(6,1,3)
+
 plt.plot(tt, x2)
 plt.xlabel("Tiempo [s]")
 plt.ylabel("Amplitud")
 plt.title("modulacion")
-
+plt.grid(True)
 plt.subplot(6,1,4)
+
 plt.plot(tt, x3)
 plt.xlabel("Tiempo [s]")
 plt.ylabel("Amplitud")
 plt.title("recortada en el 75% de la amplitud ")
-
+plt.grid(True)
 #plt.tight_layout()  # ajusta los títulos y ejes
 #plt.show()
 
-
-#plt.figure(2)
 plt.subplot(6,1,5)
 plt.plot(tt, x4)
 plt.xlabel("Tiempo [s]")
 plt.ylabel("Amplitud")
 plt.title("Funcion cuadrada")
+plt.grid(True)
 
 plt.subplot(6,1,6)
-plt.scatter(tt, pulso)
+plt.plot(tt_pulso, pulso)
 plt.xlabel("Tiempo [s]")
 plt.ylabel("Amplitud")
 plt.title("Pulso rectangular de 10 ms")
-
+plt.grid(True)
 plt.tight_layout()  # ajusta los títulos y ejes
 plt.show()
 #"""
@@ -147,7 +156,8 @@ print("señal principal vs x1 (desfasada pi/2):", fun_ortogonalidad(xx, x1))
 print("señal principal vs x2 (modulada):", fun_ortogonalidad(xx, x2))
 print("señal principal vs x3 (clipeada en amplitud):", fun_ortogonalidad(xx, x3))
 print("señal principal vs x4 (cuadrada de 4kHz):", fun_ortogonalidad(xx, x4))
-print("señal principal vs pulso:", fun_ortogonalidad(xx, pulso))
+pulso_nuevo = pulso[:len(xx)]   # mismo largo que xx (500 si N=500)
+print("señal principal vs pulso:", fun_ortogonalidad(xx, pulso_nuevo))
 print("\n")
 #"""
 #3)  3) Graficar la autocorrelación de la primera señal y la correlación entre ésta y las demás.
@@ -159,40 +169,79 @@ Rx3 = correlate(xx, x3, mode="full")
 #Rx4 = np.correlate(xx, x4, mode="full")
 #Rxpulso = np.correlate(xx, pulso, mode="full")
 Rx4 = correlate(xx, x4, mode="full")
-Rxpulso = correlate(xx, pulso, mode="full")
-
+Rxpulso = correlate(xx, pulso_nuevo, mode="full")
 
 lags = correlation_lags(len(xx), len(xx), mode="full")
 lags_time = lags * Ts
+
+# %%
+"""
+#Aca probe la de normalizar y sacarle la media, no me fue de mucho beneficio porque lo unico que hizo fue ponerla en el rango de -1 a 1
+
+def fun_correlate(x, y, mode="full", zero_mean=True):
+
+    x = np.asarray(x)
+    y = np.asarray(y)
+
+    if zero_mean:
+        x = x - np.mean(x)
+        y = y - np.mean(y)
+
+    R = correlate(x, y, mode=mode, method="auto")
+    den = np.linalg.norm(x) * np.linalg.norm(y)
+    R_norm = R / (den + 1e-12)   # normalización [-1,1]
+
+    lags = correlation_lags(len(x), len(y), mode=mode)
+    return R_norm, lags
+    
+Rxxn, lags = fun_correlate(xx, xx)
+Rx1n, lags = fun_correlate(xx, x1)
+Rx2n, lags = fun_correlate(xx, x2)
+Rx3n, lags = fun_correlate(xx, x3)
+Rx4n, lags = fun_correlate(xx, x4)
+Rxpulson, lags = fun_correlate(xx, pulso_nuevo)
+"""
+
+# %%
+
+
 #"""
 ##plt.figure(2)
-plt.figure(figsize=(18,22))
+plt.figure(figsize=(12,18))
 
 plt.subplot(6,1,1)
 plt.plot(lags_time, Rxx)
+#plt.plot(lags_time, Rxxn)
 plt.title("autocorrelacion")
 plt.xlabel("Retardo [s]")
 plt.ylabel("Rxx")
+plt.grid(True)
 
 plt.subplot(6,1,2)
 plt.plot(lags_time, Rx1)
+#plt.plot(lags_time, Rx1n)
 plt.title("x vs x1")
 plt.xlabel("Retardo [s]")
 plt.ylabel("Rxx")
-
+plt.grid(True)
 
 plt.subplot(6,1,3)
 plt.plot(lags_time, Rx2)
+#plt.plot(lags_time, Rx2n)
+
 plt.title("x vs x2")
 plt.xlabel("Retardo [s]")
 plt.ylabel("Rxx")
+plt.grid(True)
 
 plt.subplot(6,1,4)
 plt.plot(lags_time, Rx3)
+#plt.plot(lags_time, Rx3n)
+
 plt.title("x vs x3")
 plt.xlabel("Retardo [s]")
 plt.ylabel("Rxx")
-
+plt.grid(True)
 #plt.tight_layout()  # ajusta los títulos y ejes
 #plt.show()
 
@@ -200,16 +249,20 @@ plt.ylabel("Rxx")
 
 plt.subplot(6,1,5)
 plt.plot(lags_time, Rx4)
+#plt.plot(lags_time, Rx4n)
+
 plt.title("x vs x4")
 plt.xlabel("Retardo [s]")
 plt.ylabel("Rxx")
+plt.grid(True)
 
 plt.subplot(6,1,6)
 plt.plot(lags_time, Rxpulso)
+#plt.plot(lags_time, Rxpulson)
 plt.title("x vs pulso")
 plt.xlabel("Retardo [s]")
 plt.ylabel("Rxx")
-
+plt.grid(True)
 plt.tight_layout()  # ajusta los títulos y ejes
 plt.show()
 
@@ -232,3 +285,32 @@ if np.allclose([igualdad1, igualdad2, igualdad], 0, atol=1e-12):
 else:
     print("No se cumple la propiedad")
     
+#"""
+
+#"""
+## 4) Bonus
+print("\n")
+
+print("###### Ejercicio 4 ######")
+
+fs, data = wavfile.read("lacucaracha.wav")
+
+# Calcular energía
+energia_sonido = np.sum(data**2)
+
+print("Energía del sonido:", energia_sonido)
+print("La fs que me devuelve es:", fs)
+
+# Vector de tiempo propio del wav
+N_wav = len(data)
+tt_wav = np.arange(N_wav) / fs ##Esto lo hago para el tiempo, Cuando divido por fs lo pongo en segundos. 
+
+
+# Graficar señal del wav
+plt.figure()
+plt.plot(tt_wav, data)
+plt.xlabel("Tiempo [s]")
+plt.ylabel("Amplitud")
+plt.title("Señal del archivo WAV")
+plt.show()
+#"""

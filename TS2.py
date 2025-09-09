@@ -13,7 +13,7 @@ from scipy.signal import lfilter
 from scipy import signal
 
 #Aca uso todo lo mismo que en la ts1. Tambien podria importar el archivo pero se le va a complicar a los profes.
-fs = 50000
+fs = 100000
 N = 500
 f = 2000
 Ts = 1/fs
@@ -26,25 +26,37 @@ def mi_funcion_sen(vmax, dc, f, fase, N, fs):
     xx = dc + vmax * np.sin(2* np.pi * f * tt + fase)  # señal senoidal
     return tt, xx
 
+#Para hacer modulacion hay que multplicar una señal contra otra señal.
 def modulacion(vmax, dc, f, fase, N, fs):
     tt, xx = mi_funcion_sen(vmax=1, dc=0, f=f, fase=0, N = N, fs=fs)
     tt, x1 = mi_funcion_sen(vmax=1, dc=0, f=f/2, fase=0, N = N, fs=fs)
     x2 = xx * x1
     return x2
 
+
 tt, xx = mi_funcion_sen(vmax=1, dc=0, f=f, fase=0, N = N, fs=fs)
 tt, x1 = mi_funcion_sen(vmax=1, dc=0, f=f, fase=np.pi/2, N = N, fs=fs)
 x2 = modulacion(vmax=1, dc=0, f=f, fase=0, N = N, fs=fs)
+
+#Forma de hacer el clipeo para recortar la amplitud de la señal. 
 x3 = np.clip(xx,-0.75,0.75,out=None)
+
 x4 = signal.square(2*np.pi*4000*tt, duty=0.5)
 x4 = x4 - np.mean(x4)
 print("mean x4:", np.mean(x4))      # ~ 0.0
 print("sum x4:", np.sum(x4))        # ~ 0
 
-T_pulso = 0.01    # 10 ms
-N_pulso = int(round(T_pulso * fs))
-pulso = np.zeros(N)
-pulso[:N_pulso] = 1  # primeras 200 muestras valen 1
+# aca hago el del puslo. Como Npulso = Tpulso . fs. Voy a tener 200 muestras
+# como mi N lo tengo fijo en 500. voy a tener 300 muestras que estan en 0. Si yo aumento N por ejemplo, siempre voy a tener fijas 200muestras que valen 1 y las N-200=0.
+#Si yo cambio fs, me cambia el Npulso entonces ahi ya se modifican las muestras que valen 1. 
+T_pulso = 0.01    # 10 ms 
+N_pulso = int(T_pulso * fs)  # 500 muestras
+
+N1 = 2000   # señal total de 40 ms
+pulso = np.zeros(N1)
+pulso[:N_pulso] = 1
+tt_pulso = np.arange(N1) * Ts   # vector de tiempo consistente con N
+
 
 # =============================================================================
 # Ejercicio 1
@@ -79,7 +91,7 @@ delta[0] = 1
 h = en_diferencias(N = N, x = delta)
 y_conv = np.convolve(xx, h)[:N]
 
-fig, axs = plt.subplots(3, 2, figsize=(12, 8), sharex=True)
+fig, axs = plt.subplots(3, 2, figsize=(12, 8))
 axs = axs.ravel()  # aplanar para poder usar axs[i]
 
 for i, (x, nombre) in enumerate(entradas):
