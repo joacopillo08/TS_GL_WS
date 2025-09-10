@@ -41,10 +41,11 @@ x2 = modulacion(vmax=1, dc=0, f=f, fase=0, N = N, fs=fs)
 #Forma de hacer el clipeo para recortar la amplitud de la señal. 
 x3 = np.clip(xx,-0.75,0.75,out=None)
 
-x4 = signal.square(2*np.pi*4000*tt, duty=0.5)
+x4 = signal.square(2*np.pi*4000*tt)
 x4 = x4 - np.mean(x4)
-print("mean x4:", np.mean(x4))      # ~ 0.0
-print("sum x4:", np.sum(x4))        # ~ 0
+#este print esta para ver si le saque a la cuadrada la media. remoción de DC
+#print("mean x4:", np.mean(x4))      # ~ 0.0
+#print("sum x4:", np.sum(x4))        # ~ 0
 
 # aca hago el del puslo. Como Npulso = Tpulso . fs. Voy a tener 200 muestras
 # como mi N lo tengo fijo en 500. voy a tener 300 muestras que estan en 0. Si yo aumento N por ejemplo, siempre voy a tener fijas 200muestras que valen 1 y las N-200=0.
@@ -57,7 +58,19 @@ pulso = np.zeros(N1)
 pulso[:N_pulso] = 1
 tt_pulso = np.arange(N1) * Ts   # vector de tiempo consistente con N
 
-
+potencia_xx = np.mean(xx**2)
+potencia_x1 = np.mean(x1**2)
+potencia_x2 = np.mean(x2**2)
+potencia_x3 = np.mean(x3**2)
+potencia_x4 = np.mean(x4**2)
+energia_pulso = np.sum(pulso**2) * Ts #aca uso energia porque, Señales no periódicas o de duración finita. energía en unidades tiempo·amplitud^2
+print("Señal principal, Ts: ",Ts, " N: ", N, "y potencia promedio:", potencia_xx)
+print("Señal desfada, Ts: ",Ts, " N: ", N, "y potencia promedio:", potencia_x1)
+print("Señal modulada, Ts: ",Ts, " N: ", N, "y potencia promedio:", potencia_x2)
+print("Señal recortada, Ts: ",Ts, " N: ", N, "y potencia promedio:", potencia_x3)
+print("Señal cuadrada, Ts: ",Ts, " N: ", N, "y potencia promedio:", potencia_x4)
+print("Señal pulso, Ts: ",Ts, " N: ", N, "y energia:", energia_pulso)
+print("\n")
 # =============================================================================
 # Ejercicio 1
 # HECHO --> Graficar la señal de salida para cada una de las señales de entrada que generó en el TS1. Considere que las mismas son causales.
