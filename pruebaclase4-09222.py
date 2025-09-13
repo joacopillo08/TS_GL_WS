@@ -38,6 +38,7 @@ tiempo1, x1 = mi_funcion_cos(A0 = 1, offset = 0, fx = 1 , phase = 0, nn = N, fs 
 ventana_rectangular = np.ones(N)
 
 ventana_BH = signal.windows.blackmanharris(N)
+ventana_B = signal.windows.blackman(N)  # Blackman (no Harris) para coincidir con la lámina
 
 ventana_Hamming = signal.windows.hamming(N)
 
@@ -55,6 +56,8 @@ B = fft(ventana_Hamming, Nfft) / (len(ventana_Hamming)/2.0)
 C = fft(ventana_Hann, Nfft )/ (len(ventana_Hann)/2.0)
 D = fft(ventana_rectangular, Nfft) / (len(ventana_rectangular)/2.0)
 E = fft(ventana_FT, Nfft) / (len(ventana_FT)/2.0)
+F = fft(ventana_B, Nfft) / (len(ventana_B)/2.0)
+
 #freq = np.linspace(-0.5, 0.5, 2048)
 
 responseBH = 20 * np.log10(np.abs(fftshift(A / abs(A).max())))
@@ -62,6 +65,7 @@ responseHamming = 20 * np.log10(np.abs(fftshift(B / abs(B).max())))
 responseHann = 20 * np.log10(np.abs(fftshift(C / abs(C).max())))
 responseRect = 20 * np.log10(np.abs(fftshift(D / abs(D).max())))
 responseFT = 20 * np.log10(np.abs(fftshift(E / abs(E).max())))
+responseB = 20 * np.log10(np.abs(fftshift(F / abs(F).max())))
 
 rango = np.abs(freq) <= 2048  # solo los múltiplos de Δf entre -50 y 50
 
@@ -72,6 +76,7 @@ plt.plot(freq[rango], responseHamming[rango], color="green", label='Hamming')
 plt.plot(freq[rango], responseHann[rango], color="orange", label='Hann')
 plt.plot(freq[rango], responseRect[rango], color="blue", label='Rectangular')
 #plt.plot(freq[rango], responseFT[rango], color="brown", label='Flattop')
+plt.plot(freq[rango], responseB[rango], color="red", label='blackman')
 plt.legend()
 plt.grid()
 

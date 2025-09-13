@@ -34,8 +34,8 @@ freqs = np.fft.fftfreq(N, Ts)   # eje de frecuencias en Hz
 
 tiempo, x1 = mi_funcion_sen(A0 = 1, offset = 0, fx = 2, phase = 0, nn = N, fs = fs)
 tiempo, x2 = mi_funcion_sen(A0 = 1, offset = 0, fx = fs/4 * deltaF, phase = 0, nn = N, fs = fs)
-tiempo, x3 = mi_funcion_sen(A0 = 1, offset = 0, fx = ((fs/4) + 1) * deltaF, phase = 0, nn = N, fs = fs)
-tiempo, x4 = mi_funcion_sen(A0 = 1, offset = 0, fx = ((fs/4) + 0.1) * deltaF, phase = 0, nn = N, fs = fs)
+tiempo, x3 = mi_funcion_sen(A0 = 1, offset = 0, fx = ((fs/4) + 0.25) * deltaF, phase = 0, nn = N, fs = fs)
+tiempo, x4 = mi_funcion_sen(A0 = 1, offset = 0, fx = ((fs/4) + 0.5) * deltaF, phase = 0, nn = N, fs = fs)
 
 
 X1 = fft(x1)

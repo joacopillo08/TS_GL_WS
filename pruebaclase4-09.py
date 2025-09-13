@@ -4,8 +4,8 @@ from numpy.fft import fft, fftshift
 from scipy import signal
 
 # Parámetros
-N = 1000
-fs = 1000
+N = 31
+fs = 31
 Ts = 1/fs
 
 # Ventanas a comparar (las del Holton)
@@ -15,7 +15,7 @@ w_hann = signal.windows.hann(N, sym=False)
 w_black = signal.windows.blackman(N, sym=False)  # Blackman (no Harris) para coincidir con la lámina
 
 # Mucho zero-padding para DTFT suave
-Nfft = 131072
+Nfft = 32768
 
 # Eje de frecuencia angular normalizada [-pi, pi]
 freq = np.fft.fftfreq(Nfft, d=1/fs)             # [-fs/2, fs/2)
