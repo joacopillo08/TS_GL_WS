@@ -68,10 +68,10 @@ plt.ylabel("|X[k]|")
 plt.grid(True)
 
 
-plt.plot(freqs, np.log10(X2abs) * 20, 'x', label = 'X2 abs dB')
+#plt.plot(freqs, np.log10(X2abs) * 20, '--', label = 'X2 abs dB')
 #plt.plot(freqs, np.log10(X3abs) * 20, 'x', label = 'X3 abs dB')
 
-#plt.plot(freqs, np.log10(X4abs) * 20, 'x', label = 'X4 abs dB')
+plt.plot(freqs, np.log10(X4abs) * 20, label = 'X4 abs dB')
 
 plt.legend()
 plt.show()
@@ -98,6 +98,7 @@ if sumaModulo == sumaCuadrado:
 else: 
     print("No se cumple Parseval")
     
+
 
 ##Zero padding
 
