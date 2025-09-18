@@ -14,7 +14,7 @@ from scipy import signal
 
 #Aca uso todo lo mismo que en la ts1. Tambien podria importar el archivo pero se le va a complicar a los profes.
 fs = 100000
-N = 500
+N = 1000
 f = 2000
 Ts = 1/fs
 tt = np.arange(N) * Ts           # vector de tiempo
