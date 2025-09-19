@@ -1,61 +1,51 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-Created on Wed Sep 10 20:46:52 2025
 
-@author: milenawaichnan
-"""
+a0 = np.sqrt(2)
+#a0 = 2
 
-import matplotlib.pyplot as plt
-import numpy as np
-#import scipy as sc
-from scipy import signal
-from numpy.fft import fft
+SNR = 10
+omega0 = N/4
+var = 1
+media = 0
+R = 200
 
-fs = 1000 # frecuencia de muestreo, aplica para todas las señales
-N = fs  # cantidad de muestras, aplica para todas las señales 
-#fx = 2000 #frecuencia para las senoidales
-Ts = 1/fs
-deltaF = 2*np.pi/N
-fr = 0
+fr = np.random.uniform(-2, 2, R)
+#omega1 = omega0 + fr * 2 * np.pi/N
 
-A0 = np.sqrt(2)
+#na = np.random.normal(media, var)
 
-omega0 = fs / 4
-omega1 = omega0 + (fr * deltaF)
+pot_ruido = a0**2 / (2*10**(SNR/10))
+#var_ruido = np.var(ruido)
 
+flattop = window.hamming(N).reshape((-1,1))
 
+# mallas NxR
+tt_vector = np.arange(N)/fs
+tt_columnas  = tt_vector.reshape((-1,1)) # tamaño N vector columna
+TT_sen = np.tile(tt_columnas, (1,R)) # N x R, matriz
+ 
+#matriz de frecuencias verdaderas en Hz para cada columna
+f_true = ((N/4) + fr) * deltaF               # (R,)   Hz por columna
+F_cols = f_true.reshape((1, R))     # (1,R)  Hz
 
-SNRdb = np.random.uniform(3, 10)
-sigmaCuad = 10**(-SNRdb/10)
-print("varianza = ", sigmaCuad)
+xx_sen = a0 * np.sin (2 * np.pi * F_cols * TT_sen) # (N,R)
+ruido = np.random.normal(loc = 0, scale = np.sqrt(pot_ruido), size = (N, R))
+xx_sen_ruido = xx_sen + ruido
+xx_vent = xx_sen_ruido * flattop
 
+Npadd = 10#10* N
+#XX_sen = fft(xx_sen, n = 10*N, axis = 0) / N
+# XX_sen_ruido = fft(xx_vent, n = Npadd, axis = 0)#/  (N)
+# fp = np.fft.fftfreq(Npadd, d=1/fs)             # [-fs/2, fs/2)
 
-
-n = np.arange(N) * Ts
-s = A0 * np.sin(omega1 * n)
-varS = np.var(s)
-print("Var s: ", varS)
-
-Na = np.random.normal(0, sigmaCuad, N) #ruido
-#Na = 3
-#print(Na)
-varNa = np.var(Na)
-print("Var Na: ", varNa)
-
-x = s + Na
-varX = np.var(x)
-print("Var x: ", varX)
+Npad = 10*N
+XX_sen_ruido  = np.fft.rfft(xx_vent, n=Npad, axis=0)  * 1 / Npad          # (K,R)
+fp   = np.fft.rfftfreq(Npad, d=1/fs)                     # (K,) eje Hz
 
 
-X_fft= fft(x)
-Xabs = np.abs(x)
-Xang = np.angle(x)
-Xcuad = Xabs ** 2
-
-freqs = np.arange(N) * deltaF
 plt.figure()
-plt.plot(freqs, np.log10(Xcuad) * 10, label = 'X1 abs dB')
-plt.legend()
-  
-
+plt.grid(True)
+plt.plot(fp, 20*np.log10( np.abs(XX_sen_ruido)))
+plt.title("FFT")
+plt.xlabel("Hz ")
+plt.ylabel("Db")
+#lt.xlim(0,fs/2)
