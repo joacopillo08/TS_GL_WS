@@ -85,18 +85,18 @@ plt.xlim((0,fs/2))
 plt.legend()
 
 """
-
 N = 1000
 fs = N
 deltaF = fs/N
-Npadding = N#10* N
+Npadding = 10* N
 deltaF_Padding = fs/Npadding
 
 Ts = 1/fs
 k = np.arange(N)*deltaF
 t = np.arange(N)*Ts
 
-a0 = np.sqrt(2)
+#a0 = np.sqrt(2)
+a0 = 2
 R = 200
 fr = np.random.uniform(-2, 2, R)
 f1 = (N / 4 + fr) * deltaF
@@ -223,7 +223,7 @@ plt.plot(freq, 10*np.log10(np.abs(matriz_Xn3)**2) + 3)
 plt.plot(freq, 10*np.log10(np.abs(matriz_Xn4)**2) + 3)
 plt.xlabel('Frecuencia [Hz]')
 plt.ylabel('Potencia [dB]')
-#plt.xlim(0,fs/2)
+plt.xlim(0,fs/2)
 plt.grid(True)
 
 

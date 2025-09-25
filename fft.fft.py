@@ -71,7 +71,7 @@ plt.grid(True)
 #plt.plot(freqs, np.log10(X2abs) * 20, '--', label = 'X2 abs dB')
 #plt.plot(freqs, np.log10(X3abs) * 20, 'x', label = 'X3 abs dB')
 
-plt.plot(freqs, np.log10(X4abs) * 20, label = 'X4 abs dB')
+plt.plot(freqs, np.log10(X1abs) * 20, label = 'X4 abs dB')
 
 plt.legend()
 plt.show()

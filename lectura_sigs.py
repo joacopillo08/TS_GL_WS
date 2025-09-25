@@ -7,6 +7,7 @@ Created on Wed Nov  8 19:55:30 2023
 """
 
 import numpy as np
+import scipy as sp
 from scipy import signal as sig
 
 import matplotlib.pyplot as plt
@@ -28,7 +29,7 @@ fs_ecg = 1000 # Hz
 ##################
 
 # para listar las variables que hay en el archivo
-#io.whosmat('ECG_TP4.mat')
+# sio.whosmat('ECG_TP4.mat')
 # mat_struct = sio.loadmat('./ECG_TP4.mat')
 
 # ecg_one_lead = mat_struct['ecg_lead']
@@ -52,9 +53,25 @@ fs_ecg = 1000 # Hz
 
 ecg_one_lead = np.load('ecg_sin_ruido.npy')
 
-plt.figure()
-plt.plot(ecg_one_lead)
+# plt.figure()
+# plt.plot(ecg_one_lead)
 
+cant_promedio = 20
+nperseg = ecg_one_lead.shape[0] // cant_promedio
+
+print(nperseg)
+nfft = 2 * nperseg
+#win = "hann"
+#win = "blackmanharris"
+win = "flattop"
+f, Pxx = sig.welch(ecg_one_lead, fs = fs_ecg, window=win, nperseg = nperseg, nfft = nfft )
+
+
+plt.figure(figsize=(9,4))
+plt.plot(f, Pxx)
+plt.grid(True)
+plt.xlim(0,50)
+plt.tight_layout()
 
 #%%
 
@@ -76,10 +93,10 @@ fs_ppg = 400 # Hz
 ## PPG sin ruido
 ##################
 
-ppg = np.load('ppg_sin_ruido.npy')
+# ppg = np.load('ppg_sin_ruido.npy')
 
-plt.figure()
-plt.plot(ppg)
+# plt.figure()
+# plt.plot(ppg)
 
 
 #%%
@@ -88,13 +105,13 @@ plt.plot(ppg)
 # Lectura de audio #
 ####################
 
-# Cargar el archivo CSV como un array de NumPy
-fs_audio, wav_data = sio.wavfile.read('la cucaracha.wav')
-# fs_audio, wav_data = sio.wavfile.read('prueba psd.wav')
-# fs_audio, wav_data = sio.wavfile.read('silbido.wav')
+# # Cargar el archivo CSV como un array de NumPy
+# fs_audio, wav_data = sio.wavfile.read('lacucaracha.wav')
+# # fs_audio, wav_data = sio.wavfile.read('prueba psd.wav')
+# # fs_audio, wav_data = sio.wavfile.read('silbido.wav')
 
-plt.figure()
-plt.plot(wav_data)
+# plt.figure()
+# plt.plot(wav_data)
 
 # si quieren oirlo, tienen que tener el siguiente módulo instalado
 # pip install sounddevice
