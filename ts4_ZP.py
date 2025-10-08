@@ -5,7 +5,7 @@ from numpy.fft import fft, fftshift
 import matplotlib.pyplot as plt
 np.random.seed(7)
 
-#%%
+#%% DATOS
 N = 1000
 fs = N
 deltaF = fs/N
@@ -28,7 +28,10 @@ pot_senal = (a0**2)/2
 
 matriz_t = np.tile(t, (1,R))
 matriz_ff = np.tile(f1, (N,1))
-#%%
+
+freq = np.fft.fftfreq(Npadding, d = 1/fs)
+
+#%% ARMADO DE MATRIZ DE SENOIDALES Y VENTANAS. 
 matriz_x = a0 * np.sin(2 * np.pi * matriz_ff * matriz_t)
 
 flattop = window.flattop(N).reshape((-1,1))
@@ -39,15 +42,15 @@ hamming = window.hamming(N).reshape((-1,1))
 P_signal_cols = (1/N) * np.sum(matriz_x**2, axis=0)   # potencia de cada realización
 P_signal_mean = P_signal_cols.mean()
 
+## CHEQUEO DE POTENCIA 
 print("Potencias señal (min / mean / max):",
       P_signal_cols.min(), P_signal_mean, P_signal_cols.max())
 
 # ¿Está normalizada a 1?
-print("¿Potencia ~ 1 en TODAS las columnas?",
-      np.allclose(P_signal_cols, 1.0, rtol=1e-3, atol=1e-3))
+print("¿Potencia ~ 2 en TODAS las columnas?",
+      np.allclose(P_signal_cols, 2.0, rtol=1e-3, atol=1e-3))
 
-freq = np.fft.fftfreq(Npadding, d = 1/fs)
-
+## FUNCIONES PARA ARMAR LAS TABLAS DE VALORES.
 def _fmt(x):
     # Asegura float y formato científico prolijo
     return f"{np.asarray(x, dtype=float): .6e}"
@@ -60,7 +63,7 @@ def _print_block(title, rows):
         std = np.sqrt(np.maximum(var, 0.0))  # por estabilidad numérica
         print(f"{vent:<18}{_fmt(bias):>16}{_fmt(var):>16}{_fmt(std):>16}")
 
-#%%
+#%% ESTE FOR LO HICIMOS PARA ARMAR LA TABLA PARA SNR = 3 Y SNR = 10
 for SNRdb in [3, 10]:
     print(f"\n===== RESULTADOS PARA SNR = {SNRdb} dB =====")
     sigma_ruido = np.sqrt(pot_senal * 10**(-SNRdb/10))
@@ -85,7 +88,7 @@ for SNRdb in [3, 10]:
     SNR_cols_db = 10*np.log10(Ps_cols / Pn_cols)
     print(f"SNR medido (global): {SNR_meas_db:.2f} dB")
     print(f"SNR medido (mean±std por realización): {SNR_cols_db.mean():.2f} ± {SNR_cols_db.std():.2f} dB")
-#%%    
+#%%    ESTIMADORES DE AMPLITUD DE DOS FORMAS
     cg_rect = 1.0
     cg_flt  = flattop.mean()
     cg_bmh  = bmh.mean()
@@ -102,10 +105,10 @@ for SNRdb in [3, 10]:
     sesgo_bmh  = np.mean(amp_est3) - a0
     sesgo_hmg  = np.mean(amp_est4) - a0
 
-    var_rect = np.var(amp_est1, ddof=1)
-    var_flat = np.var(amp_est2, ddof=1)
-    var_bhm  = np.var(amp_est3, ddof=1)
-    var_hmg  = np.var(amp_est4, ddof=1)
+    var_rect = np.var(amp_est1, ddof=0)
+    var_flat = np.var(amp_est2, ddof=0)
+    var_bhm  = np.var(amp_est3, ddof=0)
+    var_hmg  = np.var(amp_est4, ddof=0)
 
     #estimador pero solamente en la feta de N//4
     amp_est1_bin = 2*np.abs(matriz_Xn1[Npadding//4, :]) / cg_rect
@@ -123,7 +126,7 @@ for SNRdb in [3, 10]:
     var_bhm_bin  = np.var(amp_est3_bin, ddof=0)
     var_hmg_bin  = np.var(amp_est4_bin, ddof=0)
 
-#%%
+#%% ESTIMADORES DE FRECUENCIA DE 1 MANERA 
     # Parte positiva de cada ventana
     X1p = matriz_Xn1[:Npadding//2+1, :]
     X2p = matriz_Xn2[:Npadding//2+1, :]
@@ -151,15 +154,14 @@ for SNRdb in [3, 10]:
 
     sesgo= np.mean(frec_est1) - np.mean(f1)
 
-    # Sesgo y varianza muestral (¡escalares!)
+    # Sesgo y varianza muestral, SON ESCALARES. 
     sesgo_rect1 = float(err1.mean());  var_rect1 = float(err1.var(ddof=0))
     sesgo_flat2 = float(err2.mean());  var_flat2 = float(err2.var(ddof=0))
     sesgo_bmh3  = float(err3.mean());  var_bhm3  = float(err3.var(ddof=0))
     sesgo_hmg4  = float(err4.mean());  var_hmg4  = float(err4.var(ddof=0))
     
-#%%TABLA
+#%%TABLA DE VALORES
 
-   
     print(f"\n=== TABLA SESGO Y VARIANZA — SNR = {SNRdb} dB ===")
     
     # --- Amplitud — Pico (máximo FFT ×2/CG) ---
@@ -189,9 +191,8 @@ for SNRdb in [3, 10]:
     ]
     _print_block("FRECUENCIA — Argmax (f̂ − f_true)", rows_freq)
 
-#%%
-#Graficar TODAS las realizaciones (R curvas) sin promediar
-#(+1e-20 evita -inf en dB si hay ceros; el +3 dB es el ajuste que suele usarse en la cátedra)
+#%% GRAFICOS
+
 plt.figure()
 plt.plot(freq, 10*np.log10(np.abs(matriz_Xn1)**2) + 3)
 plt.plot(freq, 10*np.log10(np.abs(matriz_Xn2)**2) + 3)
@@ -199,9 +200,9 @@ plt.plot(freq, 10*np.log10(np.abs(matriz_Xn3)**2) + 3)
 plt.plot(freq, 10*np.log10(np.abs(matriz_Xn4)**2) + 3)
 plt.xlabel('Frecuencia [Hz]')
 plt.ylabel('Potencia [dB]')
-plt.xlim(0,fs/2)
+plt.xlim(245,255)
+plt.ylim(-15,5)
 plt.grid(True)
-
 
 plt.figure()
 plt.hist(amp_est1, bins=16, alpha=0.5, label="Rectangular")
@@ -209,7 +210,7 @@ plt.hist(amp_est2, bins=16, alpha=0.5, label="Flattop")
 plt.hist(amp_est4, bins=16, alpha=0.5, label="Hamming")
 plt.hist(amp_est3, bins=16, alpha=0.5, label="Blackman-Harris")
 plt.axvline(a0, color='red', linestyle='--', linewidth=2, label="a0 real")
-plt.title("Histogramas de estimadores de amplitud (todas las ventanas)")
+plt.title("Histogramas de estimadores de amplitud (todas las ventanas) para SNR = 10dB")
 plt.xlabel("Amplitud estimada")
 plt.ylabel("Frecuencia de ocurrencia")
 plt.legend()
@@ -222,7 +223,7 @@ plt.hist(amp_est2_bin, bins=16, alpha=0.5, label="Flattop")
 plt.hist(amp_est3_bin, bins=16, alpha=0.5, label="Hamming")
 plt.hist(amp_est4_bin, bins=16, alpha=0.5, label="Blackman-Harris")
 plt.axvline(a0, color='red', linestyle='--', linewidth=2, label="a0 real")
-plt.title("Histogramas de estimadores de amplitud (todas las ventanas)")
+plt.title("Histogramas de estimadores de amplitud (todas las ventanas) para SNR = 10dB")
 plt.xlabel("Amplitud estimada")
 plt.ylabel("Frecuencia de ocurrencia")
 plt.legend()
@@ -235,7 +236,7 @@ plt.hist(frec_est2, bins=16, alpha=0.5, label="Flattop")
 plt.hist(frec_est3, bins=16, alpha=0.5, label="Blackman–Harris")
 plt.hist(frec_est4, bins=16, alpha=0.5, label="Hamming")
 plt.axvline(fs/4, color='red', ls='--', lw=2, label='f0 teórica (sin fr)')
-plt.title("Histogramas de estimadores de frecuencia")
+plt.title("Histogramas de estimadores de frecuencia para SNR = 10dB")
 plt.xlabel("Frecuencia estimada [Hz]")
 plt.ylabel("Frecuencia de ocurrencia")
 plt.legend(); plt.grid(True); plt.show()
