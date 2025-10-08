@@ -53,10 +53,10 @@ fs_ecg = 1000 # Hz
 
 ecg_one_lead = np.load('ecg_sin_ruido.npy')
 
-# plt.figure()
-# plt.plot(ecg_one_lead)
+plt.figure()
+plt.plot(ecg_one_lead)
 
-cant_promedio = 20
+cant_promedio = 15
 nperseg = ecg_one_lead.shape[0] // cant_promedio
 
 print(nperseg)

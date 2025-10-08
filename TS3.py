@@ -32,6 +32,7 @@ tt, x2, var_x = mi_funcion_sen( f = (fs/4 + 0.25) * deltaF ,  N = N, fs  = fs )
 tt, x3, var_x = mi_funcion_sen( f = (fs/4 + 0.5) * deltaF,  N = N, fs  = fs )
 
 
+
 X1 = fft(x1)
 X1abs = 1/N * np.abs(X1)
 
@@ -48,6 +49,10 @@ plt.title("FFT")
 plt.xlabel("Frecuencia [Hz]")
 plt.ylabel("Db")
 plt.grid(True)
+
+plt.plot(freqs, X1abs ,"o", label = "") ##densidad espectral de potencia
+
+
 plt.plot(freqs, 10*np.log10(2* X1abs**2) ,"--", label = 'dens esp pot fs/4') ##densidad espectral de potencia
 plt.plot(freqs, 10*np.log10(2* X2abs**2) ,"--", label = 'dens esp pot fs/4 + 0.25') ##densidad espectral de potencia
 plt.plot(freqs, 20*np.log10(2*X3abs**2) ,"--", label = 'dens esp pot fs/4 + 0.5') ##densidad espectral de potencia
@@ -106,8 +111,12 @@ fft_zeroPadding2abs = 1/N * np.abs(fft_zeroPadding2)
 fft_zeroPadding3abs = 1/N * np.abs(fft_zeroPadding3)
 
 
-"""
-freqs1 = np.arange(10 * N) * deltaF
+freqs1 = np.arange(10 * N) * (deltaF/10)
+
+plt.plot(freqs1, fft_zeroPadding1, 'o',label = 'Zero Padding con fs/4')
+plt.plot(250, np.max(fft_zeroPadding1abs), 'o',label = 'Zero Padding con fs/4')
+
+
 #freq1 = np.abs(fft_zeroPadding) ** 2
 plt.figure(figsize=(10,8))
 # Subplot 1
@@ -140,7 +149,7 @@ plt.xlim(2200, 2800) # zoom al lóbulo principal
 
 plt.tight_layout()
 plt.show()
-"""
+
 Npad = 10*N
 eps = 1e-20
 

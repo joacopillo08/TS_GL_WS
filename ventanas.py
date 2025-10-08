@@ -16,6 +16,7 @@ N = 1000
 Fs = 1000
 tt = np.arange(0.0, N/Fs, 1/Fs)
 ff = np.arange(0.0, Fs, N/Fs)
+#freqs = np.fft.fftfreq(N, Ts)  
 
 # ahora podemos simular que los canales están desconectados,
 # o que una señal de ruido blanco, normalmente distribuido ingresa al ADC.
@@ -23,23 +24,39 @@ canales_ADC = 1
 a0 = 1 # Volt
 f0 = N/4 * Fs/N
 
-dd = win.blackman(N)
+dd = win.flattop(N)
+dd1 = win.hann(N)
+dd2 = win.hamming(N)
+dd3 = win.blackmanharris(N)
+
+
+
+# X1 = fft(dd)
+# X1abs = 1/N * np.abs(X1)
+# plt.plot( X1abs )
+
+
+
 
 bfrec = ff <= Fs/2
 
 ft_dd = fft( dd )
-# ft_dd = fft( dd, axis = 0 )
+ft_dd = fft( dd, axis = 0 )
 
 plt.close('all')
 
 plt.figure(2)
 plt.plot( ff[bfrec], np.abs(ft_dd[bfrec]) )
-# plt.plot( ff[bfrec], 20*np.log10(np.abs(ft_dd[bfrec])) )
+plt.plot( ff[bfrec], 20*np.log10(np.abs(ft_dd[bfrec])) )
 plt.ylabel('Módulo [¿Volts?]')
 plt.xlabel('Frecuencia [Hz]')
 
 plt.figure(1)
 plt.plot( tt, dd )
+plt.plot( tt, dd1 )
+plt.plot( tt, dd2 )
+plt.plot( tt, dd3)
+
 plt.ylabel('#')
 plt.xlabel('t [s]')
 
