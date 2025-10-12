@@ -3,27 +3,45 @@ import matplotlib.pyplot as plt
 from scipy.io import wavfile
 import scipy.signal.windows as spsw
 
-# --- Leer WAV ---
-fs, data = wavfile.read("La440.wav")
 
-# A mono si viene estéreo
-if data.ndim == 2:
-    data = data.mean(axis=1)
+# === LECTURA DEL AUDIO ===
+fs, x = wavfile.read("La440.wav")
 
-# A float y quitar DC
-x = data.astype(np.float64)
-x = x - x.mean()
+# Si viene en estéreo → a mono
+if x.ndim == 2:
+    x = x.mean(axis=1)
 
-N = len(x)
+# Normalizo amplitud a [-1, 1]
+x = x.astype(np.float64)
+x = x / np.max(np.abs(x))
+
+# === PARÁMETROS DEL DELAY ===
+delay_time = 0.35        # segundos (ajustá para más/menos eco)
+a = 0.8                   # feedback (0 < a < 1) — probá entre 0.3 y 0.6
+D = int(delay_time * fs)  # retardo en muestras
+
+# === ECUACIÓN EN DIFERENCIAS RECURSIVA ===
+y = np.zeros(len(x) + D)
+for n in range(len(x)):
+    y[n] += x[n]
+    if n >= D:
+        # versión suavizada con un leve "low-pass" en el feedback
+        y[n] += a * (0.7 * y[n - D] + 0.3 * y[n - D - 1])
+
+# === NORMALIZACIÓN FINAL ===
+y = y / np.max(np.abs(y)) * 0.8
+
+# === GUARDAR EL RESULTADO ===
+wavfile.write("La440_delay.wav", fs, y.astype(np.float32))
+
+print("✅ Delay aplicado correctamente → 'La440_delay.wav' generado.")
+N = len(y)
 Ts = 1.0 / fs
 
 # --- Ventanas ---
 ventanas = {
     "Rectangular": np.ones(N),
     "Hann": spsw.hann(N, sym=False),
-    "Hamming": spsw.hamming(N, sym=False),
-    "Blackman-Harris": spsw.blackmanharris(N, sym=False),
-    "Flattop": spsw.flattop(N, sym=False),
 }
 
 # --- Eje de frecuencias (unilateral) ---
@@ -46,7 +64,7 @@ for nombre, w in ventanas.items():
     # Coherent Gain (ganancia a una senoidal “bin-centered”)
     CG = w.mean()  # = sum(w)/N
 
-    xw = x * w
+    xw = y * w
     X = np.fft.rfft(xw) / (N * CG)  # corregimos por N y CG para comparar amplitudes
     mag = np.abs(X)
 
@@ -82,5 +100,3 @@ plt.legend()
 plt.tight_layout()
 
 plt.show()
-
-
