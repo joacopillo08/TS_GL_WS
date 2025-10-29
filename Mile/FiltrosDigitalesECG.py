@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Oct 29 16:38:17 2025
+
+@author: JGL
+"""
+
 #!/usr/bin/env python3
 # -- coding: utf-8 --
 """
@@ -34,26 +41,31 @@ alpha_s = 40/2 #atenuacion de stop/detenida, alfa_min, minima atenuacion requeri
 #f_aprox = 'bessel'
 
 # --- Diseño de filtro analogico ---
-f_aprox = 'butter'
-mi_sos_butter = signal.iirdesign(wp = wp, ws = ws, gpass = alpha_p, gstop = alpha_s, analog = False, ftype = f_aprox, output ='sos', fs=fs) #devuelve dos listas de coeficientes, b para P y a para Q
-f_aprox = 'cheby1'
-mi_sos_cheby1 = signal.iirdesign(wp = wp, ws = ws, gpass = alpha_p, gstop = alpha_s, analog = False, ftype = f_aprox, output ='sos', fs=fs) #devuelve dos listas de coeficientes, b para P y a para Q
-f_aprox = 'cheby2'
-mi_sos_cheby2 = signal.iirdesign(wp = wp, ws = ws, gpass = alpha_p, gstop = alpha_s, analog = False, ftype = f_aprox, output ='sos', fs=fs) #devuelve dos listas de coeficientes, b para P y a para Q
+# f_aprox = 'butter'
+# mi_sos_butter = signal.iirdesign(wp = wp, ws = ws, gpass = alpha_p, gstop = alpha_s, analog = False, ftype = f_aprox, output ='sos', fs=fs) #devuelve dos listas de coeficientes, b para P y a para Q
+# f_aprox = 'cheby1'
+# mi_sos_cheby1 = signal.iirdesign(wp = wp, ws = ws, gpass = alpha_p, gstop = alpha_s, analog = False, ftype = f_aprox, output ='sos', fs=fs) #devuelve dos listas de coeficientes, b para P y a para Q
+# f_aprox = 'cheby2'
+# mi_sos_cheby2 = signal.iirdesign(wp = wp, ws = ws, gpass = alpha_p, gstop = alpha_s, analog = False, ftype = f_aprox, output ='sos', fs=fs) #devuelve dos listas de coeficientes, b para P y a para Q
 f_aprox = 'cauer'
 mi_sos_cauer = signal.iirdesign(wp = wp, ws = ws, gpass = alpha_p, gstop = alpha_s, analog = False, ftype = f_aprox, output ='sos', fs=fs) #devuelve dos listas de coeficientes, b para P y a para Q
 
 # %%
+mi_sos = mi_sos_cauer
 
 # --- Respuesta en frecuencia ---
-w, h= signal.freqz_sos(mi_sos_butter, worN = np.logspace(-2, 1.9, 1000), fs = fs) #calcula rta en frq del filtro, devuelve w y vector de salida (h es numero complejo)
+w, h= signal.freqz_sos(mi_sos, worN = np.logspace(-2, 1.9, 1000), fs = fs) #calcula rta en frq del filtro, devuelve w y vector de salida (h es numero complejo)
+
+# --- Cálculo de fase y retardo de grupo ---
 
 fase = np.unwrap(np.angle(h)) #unwrap hace grafico continuo
 
 w_rad = w / (fs / 2) * np.pi
 gd = -np.diff(fase) / np.diff(w_rad) #retardo de grupo [rad/rad]
 
-z, p, k = signal.sos2zpk(mi_sos_butter) #ubicacion de polos y ceros, z=ubicacion de ceros(=0), p=ubicacion polos, k
+# --- Polos y ceros ---
+
+z, p, k = signal.sos2zpk(mi_sos) #ubicacion de polos y ceros, z=ubicacion de ceros(=0), p=ubicacion polos, k
 
 # --- Gráficas ---
 #plt.figure(figsize=(12,10))
@@ -117,16 +129,16 @@ mat_struct = sio.loadmat('./ECG_TP4.mat')
 ecg_one_lead = mat_struct['ecg_lead'].flatten()
 N = len(ecg_one_lead)
 
-ecg_filt_butt = signal.sosfiltfilt(mi_sos_butter, ecg_one_lead)
+# ecg_filt_butt = signal.sosfiltfilt(mi_sos_butter, ecg_one_lead)
 ecg_filt_cauer = signal.sosfiltfilt(mi_sos_cauer, ecg_one_lead)
-ecg_filt_cheb1 = signal.sosfiltfilt(mi_sos_cheby1, ecg_one_lead)
-ecg_filt_cheb2 = signal.sosfiltfilt(mi_sos_cheby2, ecg_one_lead)
+# ecg_filt_cheb1 = signal.sosfiltfilt(mi_sos_cheby1, ecg_one_lead)
+# ecg_filt_cheb2 = signal.sosfiltfilt(mi_sos_cheby2, ecg_one_lead)
 
 plt.figure()
 
 plt.plot(ecg_one_lead, label = 'ecg raw')
-plt.plot(ecg_filt_butt, label = 'butter')
-#plt.plot(ecg_filt_cauer, label = 'cauer')
+# plt.plot(ecg_filt_butt, label = 'butter')
+plt.plot(ecg_filt_cauer, label = 'cauer')
 #plt.plot(ecg_filt_cheb1, label = 'cheby1')
 #plt.plot(ecg_filt_cheb2, label = 'cheby2')
 
