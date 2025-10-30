@@ -122,7 +122,8 @@ mat_struct = sio.loadmat('./ECG_TP4.mat')
 ecg_one_lead = mat_struct['ecg_lead'].flatten()
 N = len(ecg_one_lead)
 
-ecg_filt_cauer = signal.sosfiltfilt(mi_sos_cauer, ecg_one_lead)
+ecg_filt_cauer = signal.sosfiltfilt(mi_sos, ecg_one_lead)
+# ecg_filt_cauer = signal.sosfilt(mi_sos, ecg_one_lead)
 
 plt.figure()
 
@@ -206,3 +207,4 @@ for ii in regs_interes:
     axes_hdl.set_yticks(())
            
     plt.show()
+
