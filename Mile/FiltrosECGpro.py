@@ -122,7 +122,8 @@ mat_struct = sio.loadmat('./ECG_TP4.mat')
 ecg_one_lead = mat_struct['ecg_lead'].flatten()
 N = len(ecg_one_lead)
 
-ecg_filt_cauer = signal.sosfiltfilt(mi_sos_cauer, ecg_one_lead)
+ecg_filt_cauer = signal.sosfiltfilt(mi_sos, ecg_one_lead)
+# ecg_filt_cauer = signal.sosfilt(mi_sos, ecg_one_lead)
 
 plt.figure()
 
@@ -150,6 +151,7 @@ plt.show()
 # Regiones de interés sin ruido #
 #################################
 
+<<<<<<< HEAD
 cant_muestras = len(ecg_one_lead)
 
 regs_interes = (
@@ -206,3 +208,7 @@ for ii in regs_interes:
     axes_hdl.set_yticks(())
            
     plt.show()
+=======
+
+
+>>>>>>> 4418a4470e56746508ebb3f6e8b5d9949f0d2e00
