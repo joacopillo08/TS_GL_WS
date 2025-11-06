@@ -1,0 +1,191 @@
+
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Nov  5 12:39:28 2025
+
+@author: JGL
+"""
+
+
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import signal
+import scipy.io as sio
+import matplotlib.patches as patches
+from scipy.signal import firwin2, freqz, firls
+
+from pytc2.sistemas_lineales import plot_plantilla
+# from pytc2.filtros_digitales import fir_design_pm
+#filtro normalizado -> todas las singularidades en el circulo unitario?
+#--- Plantilla de diseño ---
+
+fs = 1000
+wp = (0.8, 35) #freq de corte/paso (rad/s)
+ws = (0.1, 40) #freq de stop/detenida (rad/s)
+
+#si alpha_p es =3 -> max atenuacion, butter
+
+alpha_p = 1/2 #atenuacion de corte/paso, alfa_max, perdida en banda de paso 
+alpha_s = 40/2 #atenuacion de stop/detenida, alfa_min, minima atenuacion requerida en banda de paso 
+
+f_aprox = 'cauer'
+mi_sos_cauer = signal.iirdesign(wp = wp, ws = ws, gpass = alpha_p, gstop = alpha_s, analog = False, ftype = f_aprox, output ='sos', fs=fs) #devuelve dos listas de coeficientes, b para P y a para Q
+
+# %%
+mi_sos = mi_sos_cauer
+
+# --- Respuesta en frecuencia ---
+w, h= signal.freqz_sos(mi_sos, worN = np.logspace(-2, 1.9, 1000), fs = fs) #calcula rta en frq del filtro, devuelve w y vector de salida (h es numero complejo)
+
+# --- Cálculo de fase y retardo de grupo ---
+
+fase = np.unwrap(np.angle(h)) #unwrap hace grafico continuo
+
+w_rad = w / (fs / 2) * np.pi
+gd = -np.diff(fase) / np.diff(w_rad) #retardo de grupo [rad/rad]
+
+# --- Polos y ceros ---
+
+z, p, k = signal.sos2zpk(mi_sos) #ubicacion de polos y ceros, z=ubicacion de ceros(=0), p=ubicacion polos, k
+
+# --- Gráficas ---
+#plt.figure(figsize=(12,10))
+
+# Magnitud
+plt.subplot(3,1,1)
+plt.plot(w, 20*np.log10(abs(h)), label = f_aprox)
+plot_plantilla(filter_type = 'bandpass' , fpass = wp, ripple = alpha_p*2 , fstop = ws, attenuation = alpha_s*2, fs = fs)
+plt.title('Respuesta en Magnitud')
+plt.xlabel('Pulsación angular [r/s]')
+plt.ylabel('|H(jω)| [dB]')
+plt.grid(True, which='both', ls=':')
+
+# Fase
+plt.subplot(3,1,2)
+plt.plot(w, fase, label = f_aprox)
+plt.title('Fase')
+plt.xlabel('Pulsación angular [r/s]')
+plt.ylabel('Fase [°]')
+plt.grid(True, which='both', ls=':')
+
+# Retardo de grupo
+plt.subplot(3,1,3)
+plt.plot(w[:-1], gd, label = f_aprox)
+plt.title('Retardo de Grupo ')
+plt.xlabel('Pulsación angular [r/s]')
+plt.ylabel('τg [# muestras]')
+plt.grid(True, which='both', ls=':')
+plt.legend()
+
+
+# %%
+# frecuencias= np.sort(np.concatenate(0, wp,ws, fs/2))
+frecuencias= np.sort(np.concatenate(((0,fs/2), wp,ws)))
+
+deseado = [0,0,1,1,0,0]
+cant_coef = 2000
+retardo = (cant_coef-1)//2
+
+
+fir_win = firwin2(numtaps = cant_coef, freq = frecuencias, window = "boxcar",nfreqs = cant_coef**2-1, gain = deseado, fs = fs)
+
+f_aprox1 = 'FIR WINDOW'
+
+# --- Respuesta en frecuencia ---
+w, h= freqz(fir_win, worN = np.logspace(-2, 2, 1000), fs = fs) #calcula rta en frq del filtro, devuelve w y vector de salida (h es numero complejo)
+
+# --- Cálculo de fase y retardo de grupo ---
+
+fase = np.unwrap(np.angle(h)) #unwrap hace grafico continuo
+
+w_rad = w / (fs / 2) * np.pi
+gd = -np.diff(fase) / np.diff(w_rad) #retardo de grupo [rad/rad]
+
+# --- Polos y ceros ---
+
+z, p, k = signal.sos2zpk(signal.tf2sos(fir_win,a= 1)) #ubicacion de polos y ceros, z=ubicacion de ceros(=0), p=ubicacion polos, k
+
+# --- Gráficas ---
+#plt.figure(figsize=(12,10))
+
+# Magnitud
+plt.subplot(3,1,1)
+plt.plot(w, 20*np.log10(abs(h)), label = f_aprox1)
+plot_plantilla(filter_type = 'bandpass' , fpass = wp, ripple = alpha_p*2 , fstop = ws, attenuation = alpha_s*2, fs = fs)
+plt.title('Respuesta en Magnitud')
+plt.xlabel('Pulsación angular [r/s]')
+plt.ylabel('|H(z)| [dB]')
+plt.grid(True, which='both', ls=':')
+
+# Fase
+plt.subplot(3,1,2)
+plt.plot(w, fase,label = f_aprox1)
+plt.title('Fase')
+plt.xlabel('Pulsación angular [r/s]')
+plt.ylabel('Fase [°]')
+plt.grid(True, which='both', ls=':')
+
+# Retardo de grupo
+plt.subplot(3,1,3)
+plt.plot(w[:-1], gd,label = f_aprox1)
+plt.title('Retardo de Grupo ')
+plt.xlabel('Pulsación angular [r/s]')
+plt.ylabel('τg [# muestras]')
+plt.grid(True, which='both', ls=':')
+plt.legend()
+
+
+# %%
+deseado = [0,0,1,1,0,0]
+cant_coef = 1999
+retardo = (cant_coef-1)//2
+
+
+h_firls  = firls(numtaps = cant_coef, bands = frecuencias, desired =deseado ,weight=None,  fs = fs)
+
+f_aprox2 = 'FIR CM'
+
+
+# --- Respuesta en frecuencia ---
+w, h= freqz(h_firls, worN = np.logspace(-2, 2, 1000), fs = fs) #calcula rta en frq del filtro, devuelve w y vector de salida (h es numero complejo)
+
+# --- Cálculo de fase y retardo de grupo ---
+
+fase = np.unwrap(np.angle(h)) #unwrap hace grafico continuo
+
+w_rad = w / (fs / 2) * np.pi
+gd = -np.diff(fase) / np.diff(w_rad) #retardo de grupo [rad/rad]
+
+# --- Polos y ceros ---
+
+z, p, k = signal.sos2zpk(signal.tf2sos(h_firls,a= 1)) #ubicacion de polos y ceros, z=ubicacion de ceros(=0), p=ubicacion polos, k
+
+# --- Gráficas ---
+#plt.figure(figsize=(12,10))
+
+# Magnitud
+plt.subplot(3,1,1)
+plt.plot(w, 20*np.log10(abs(h)), label = f_aprox2)
+plot_plantilla(filter_type = 'bandpass' , fpass = wp, ripple = alpha_p*2 , fstop = ws, attenuation = alpha_s*2, fs = fs)
+plt.title('Respuesta en Magnitud')
+plt.xlabel('Pulsación angular [r/s]')
+plt.ylabel('|H(z)| [dB]')
+plt.grid(True, which='both', ls=':')
+
+# Fase
+plt.subplot(3,1,2)
+plt.plot(w, fase,label = f_aprox2)
+plt.title('Fase')
+plt.xlabel('Pulsación angular [r/s]')
+plt.ylabel('Fase [°]')
+plt.grid(True, which='both', ls=':')
+
+# Retardo de grupo
+plt.subplot(3,1,3)
+plt.plot(w[:-1], gd,label = f_aprox2)
+plt.title('Retardo de Grupo ')
+plt.xlabel('Pulsación angular [r/s]')
+plt.ylabel('τg [# muestras]')
+plt.grid(True, which='both', ls=':')
+plt.legend()
+

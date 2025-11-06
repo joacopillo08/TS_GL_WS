@@ -17,10 +17,11 @@ from scipy import signal
 import scipy.io as sio
 import matplotlib.patches as patches
 from scipy.signal import firwin2, freqz, firls
+from pytc2.sistemas_lineales import plot_plantilla
 
-fs = 2000
-wp = [0.8, 35] #freq de corte/paso (rad/s)
-ws = [0.1, 35.7] #freq de stop/detenida (rad/s)
+fs = 1000
+wp = (0.8, 35) #freq de corte/paso (rad/s)
+ws = (0.14, 35.7) #freq de stop/detenida (rad/s)
 
 #si alpha_p es =3 -> max atenuacion, butter
 
@@ -32,11 +33,12 @@ alpha_s = 40/2 #atenuacion de stop/detenida, alfa_min, minima atenuacion requeri
 frecuencias= np.sort(np.concatenate(((0,fs/2), wp,ws)))
 
 deseado = [0,0,1,1,0,0]
-cant_coef = 1999
+cant_coef = 2001
 retardo = (cant_coef-1)//2
 
+peso = [6,1,1]
 
-h_firls  = firls(numtaps = cant_coef, bands = frecuencias, desired =deseado ,weight=None,  fs = fs)
+h_firls  = firls(numtaps = cant_coef, bands = frecuencias, desired =deseado ,weight= peso,  fs = fs)
 
 # %%
 
@@ -60,6 +62,7 @@ z, p, k = signal.sos2zpk(signal.tf2sos(h_firls,a= 1)) #ubicacion de polos y cero
 # Magnitud
 plt.subplot(3,1,1)
 plt.plot(w, 20*np.log10(abs(h)))
+plot_plantilla(filter_type = 'bandpass' , fpass = (0.8, 35), ripple = alpha_p*2 , fstop = (0.1, 40), attenuation = alpha_s*2, fs = fs)
 plt.title('Respuesta en Magnitud')
 plt.xlabel('Pulsación angular [r/s]')
 plt.ylabel('|H(z)| [dB]')
@@ -104,7 +107,7 @@ plt.grid(True, which='both', ls=':')
 # plt.grid(True)
 # plt.tight_layout()
 # plt.show()
-
+"""
 #%%
 
 ##################
@@ -207,3 +210,4 @@ for ii in regs_interes:
     axes_hdl.set_yticks(())
            
     plt.show()
+"""
