@@ -44,3 +44,7 @@ plt.xlabel('x')
 plt.ylabel('τg [# muestras]')
 plt.grid(True, which='both', ls=':')
 plt.legend()
+
+
+
+
