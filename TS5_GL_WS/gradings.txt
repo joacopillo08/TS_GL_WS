@@ -1,0 +1,22 @@
+Informe:
+    Edición: Pasar el Jupyter Notebook por un corrector-. Por ejemplo, donde dice por ultimo debió decir por último.
+    Conclusión: La conclusión necesita más trabajo, hay que contar un poco cómo les fue con el método que empleaste 
+    para la estimación de los espectros y las ventanas que usaste para las tres señales que consideramos. Hablando 
+    de la varianza y la resolución espectral.
+
+Código: El código en el Jupyter Notebook no corre como corresponde, tira un error en:
+    ppg = np.load('ppg_sin_ruido.npy')
+    Error: [Errno 2] No such file or directory: 'ppg_sin_ruido.npy'    
+
+Desarrollo:
+    Hay que publicar el trabajo en el nbviewer, mostrame el error generando un Issue en el repositorio en GitHub.
+    En líneas generales el trabajo está bien desarrollado. Falta trabajar en lo siguiente: 
+    * Justificar mejor por qué Welch para todas las señales, por qué no Blackman-Tukey
+    * En el caso de las señales de audio, exponer los anchos de banda, no los límites.
+    * Falta hablar más sobre las varianzas en las estimaciones, en el mejor de los casos hacer algún cálculo para 
+      tener una idea del valor.
+    * La señal PPG es mejor graficarla en un rango temporal menor.
+    
+Sugerencias:
+    * Para un Jupyter Notebook más limpio es mejor poner todas las líneas relacionadas con el ploteo de las 
+      funciones, como funciones definidas en un archivo.py, importarlas y usarlas.
