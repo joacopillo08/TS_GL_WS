@@ -101,103 +101,103 @@ plt.grid(True, which='both', ls=':')
 
 #%%
 
-# ##################
-# # Lectura de ECG #
-# ##################
+##################
+# Lectura de ECG #
+##################
 
-# fs_ecg = 1000 # Hz
+fs_ecg = 1000 # Hz
 
-# ##################
-# ## ECG con ruido
-# ##################
+##################
+## ECG con ruido
+##################
 
-# # para listar las variables que hay en el archivo
-# #io.whosmat('ECG_TP4.mat')
-# mat_struct = sio.loadmat('./ECG_TP4.mat')
-# ecg_one_lead = mat_struct['ecg_lead'].flatten()
-# N = len(ecg_one_lead)
+# para listar las variables que hay en el archivo
+#io.whosmat('ECG_TP4.mat')
+mat_struct = sio.loadmat('./ECG_TP4.mat')
+ecg_one_lead = mat_struct['ecg_lead'].flatten()
+N = len(ecg_one_lead)
 
-# ecg_filt_win = signal.lfilter(b = fir_win, a = 1, x = ecg_one_lead)
+ecg_filt_win = signal.lfilter(b = fir_win, a = 1, x = ecg_one_lead)
 
-# plt.figure()
+plt.figure()
 
-# plt.plot(ecg_one_lead, label = 'ecg raw')
-# plt.plot(ecg_filt_win, label = 'cauer')
+plt.plot(ecg_one_lead, label = 'ecg raw')
+plt.plot(ecg_filt_win, label = 'cauer')
 
-# plt.legend()
+plt.legend()
 
 
-# plt.figure()
-# t = np.arange(N) / fs_ecg  # vector de tiempo en segundos
-# # plt.plot(t[4000:5500], ecg_one_lead[4000:5500], label='ECG crudo')
-# # plt.plot(t[4000:5500], ecg_filt_cauer[4000:5500], label='ECG filtrado (Cauer)')
-# plt.plot(ecg_one_lead[80750:89000], label='ECG crudo')
-# plt.plot(ecg_filt_win[80750:89000], label='ECG filtrado (Cauer)')
-# # plt.xlabel('Tiempo [s]')
-# plt.ylabel('Amplitud')
-# plt.title('ECG con y sin filtrado')
-# plt.legend()
-# plt.grid(True)
-# plt.show()
+plt.figure()
+t = np.arange(N) / fs_ecg  # vector de tiempo en segundos
+# plt.plot(t[4000:5500], ecg_one_lead[4000:5500], label='ECG crudo')
+# plt.plot(t[4000:5500], ecg_filt_cauer[4000:5500], label='ECG filtrado (Cauer)')
+plt.plot(ecg_one_lead[80750:89000], label='ECG crudo')
+plt.plot(ecg_filt_win[80750:89000], label='ECG filtrado (Cauer)')
+# plt.xlabel('Tiempo [s]')
+plt.ylabel('Amplitud')
+plt.title('ECG con y sin filtrado')
+plt.legend()
+plt.grid(True)
+plt.show()
 
-# #%%
-# #################################
-# # Regiones de interés sin ruido #
-# #################################
+#%%
+#################################
+# Regiones de interés sin ruido #
+#################################
 
-# cant_muestras = len(ecg_one_lead)
+cant_muestras = len(ecg_one_lead)
 
-# regs_interes = (
-#         [4000, 5500], # muestras
-#         [10e3, 11e3], # muestras
-#         )
+regs_interes = (
+        [4000, 5500], # muestras
+        [10e3, 11e3], # muestras
+        )
  
-# for ii in regs_interes:
+for ii in regs_interes:
    
-#     # intervalo limitado de 0 a cant_muestras
-#     zoom_region = np.arange(np.max([0, ii[0]]), np.min([cant_muestras, ii[1]]), dtype='uint')
+    # intervalo limitado de 0 a cant_muestras
+    zoom_region = np.arange(np.max([0, ii[0]]), np.min([cant_muestras, ii[1]]), dtype='uint')
    
-#     plt.figure()
-#     plt.plot(zoom_region, ecg_one_lead[zoom_region], label='ECG', linewidth=2)
-#     # plt.plot(zoom_region, ecg_filt_win[zoom_region], label='Butterworth')
-#     plt.plot(zoom_region, ecg_filt_win[zoom_region + retardo], label='FIR Window')
+    plt.figure()
+    plt.plot(zoom_region, ecg_one_lead[zoom_region], label='ECG', linewidth=2)
+    # plt.plot(zoom_region, ecg_filt_win[zoom_region], label='Butterworth')
+    plt.plot(zoom_region, ecg_filt_win[zoom_region + retardo], label='FIR Window')
    
-#     plt.title('ECG sin ruido desde ' + str(ii[0]) + ' to ' + str(ii[1]) )
-#     plt.ylabel('Adimensional')
-#     plt.xlabel('Muestras (#)')
+    plt.title('ECG sin ruido desde ' + str(ii[0]) + ' to ' + str(ii[1]) )
+    plt.ylabel('Adimensional')
+    plt.xlabel('Muestras (#)')
    
-#     axes_hdl = plt.gca()
-#     axes_hdl.legend()
-#     axes_hdl.set_yticks(())
+    axes_hdl = plt.gca()
+    axes_hdl.legend()
+    axes_hdl.set_yticks(())
            
-#     plt.show()
+    plt.show()
  
-# #################################
-# # Regiones de interés con ruido #
-# #################################
+#################################
+# Regiones de interés con ruido #
+#################################
  
-# regs_interes = (
-#         np.array([5, 5.2]) *60*fs, # minutos a muestras
-#         np.array([12, 12.4]) *60*fs, # minutos a muestras
-#         np.array([15, 15.2]) *60*fs, # minutos a muestras
-#         )
+regs_interes = (
+        np.array([5, 5.2]) *60*fs, # minutos a muestras
+        np.array([12, 12.4]) *60*fs, # minutos a muestras
+        np.array([15, 15.2]) *60*fs, # minutos a muestras
+        )
  
-# for ii in regs_interes:
+for ii in regs_interes:
    
-#     # intervalo limitado de 0 a cant_muestras
-#     zoom_region = np.arange(np.max([0, ii[0]]), np.min([cant_muestras, ii[1]]), dtype='uint')
+    # intervalo limitado de 0 a cant_muestras
+    zoom_region = np.arange(np.max([0, ii[0]]), np.min([cant_muestras, ii[1]]), dtype='uint')
    
-#     plt.figure()
-#     plt.plot(zoom_region, ecg_one_lead[zoom_region], label='ECG', linewidth=2)
-#     # plt.plot(zoom_region, ecg_filt_win[zoom_region], label='Butterworth')
-#     plt.plot(zoom_region, ecg_filt_win[zoom_region + retardo], label='FIR Window')
+    plt.figure()
+    plt.plot(zoom_region, ecg_one_lead[zoom_region], label='ECG', linewidth=2)
+    # plt.plot(zoom_region, ecg_filt_win[zoom_region], label='Butterworth')
+    plt.plot(zoom_region, ecg_filt_win[zoom_region + retardo], label='FIR Window')
    
-#     plt.title('ECG con ruido desde ' + str(ii[0]) + ' to ' + str(ii[1]) )
-#     plt.ylabel('Adimensional')
-#     plt.xlabel('Muestras (#)')
+    plt.title('ECG con ruido desde ' + str(ii[0]) + ' to ' + str(ii[1]) )
+    plt.ylabel('Adimensional')
+    plt.xlabel('Muestras (#)')
    
-#     axes_hdl = plt.gca()
-#     axes_hdl.legend()
-#     axes_hdl.set_yticks(())
+    axes_hdl = plt.gca()
+    axes_hdl.legend()
+    axes_hdl.set_yticks(())
            
-#     plt.show()
+    plt.show()

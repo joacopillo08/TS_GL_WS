@@ -20,7 +20,7 @@ from scipy.signal import firwin2, freqz, firls
 from pytc2.sistemas_lineales import plot_plantilla
 
 fs = 1000
-wp = (0.8, 35) #freq de corte/paso (rad/s)
+wp = (0.95, 35) #freq de corte/paso (rad/s)
 ws = (0.14, 35.7) #freq de stop/detenida (rad/s)
 
 #si alpha_p es =3 -> max atenuacion, butter
@@ -30,13 +30,15 @@ alpha_s = 40/2 #atenuacion de stop/detenida, alfa_min, minima atenuacion requeri
 
 
 # frecuencias= np.sort(np.concatenate(0, wp,ws, fs/2))
-frecuencias= np.sort(np.concatenate(((0,fs/2), wp,ws)))
+#frecuencias= np.sort(np.concatenate(((0,fs/2), wp,ws)))
+frecuencias = [0, ws[0], wp[0], wp[1], ws[1], fs/2]
+
 
 deseado = [0,0,1,1,0,0]
 cant_coef = 2001
 retardo = (cant_coef-1)//2
 
-peso = [6,1,1]
+peso = [12,4,4]
 
 h_firls  = firls(numtaps = cant_coef, bands = frecuencias, desired =deseado ,weight= peso,  fs = fs)
 
