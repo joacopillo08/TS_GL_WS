@@ -265,15 +265,15 @@ mat_struct = sio.loadmat('./ECG_TP4.mat')
 ecg_one_lead = mat_struct['ecg_lead'].flatten()
 N = len(ecg_one_lead)
 
-ecg_filt_cauer = signal.sosfiltfilt(mi_sos, ecg_one_lead)
+# ecg_filt_cauer = signal.sosfiltfilt(mi_sos, ecg_one_lead)
 # ecg_filt_cauer = signal.sosfilt(mi_sos, ecg_one_lead)
 
-# plt.figure()
+plt.figure()
 
-# plt.plot(ecg_one_lead, label = 'ecg raw')
+plt.plot(ecg_one_lead[402:403], label = 'ecg raw')
 # plt.plot(ecg_filt_cauer, label = 'cauer')
 
-# plt.legend()
+plt.legend()
 
 
 # plt.figure()
