@@ -122,9 +122,24 @@ for ii in regs_interes:
     plt.show()
 
 plt.plot(ecg_one_lead)
-plt.plot(b)
-plt.plot(filtro_med_600)
+# plt.plot(b)
+# plt.plot(filtro_med_600)
 
 
+QRS = 140
+t = np.linspace(-1, 1, QRS)
+sigma = 0.2
+gauss_derivada = -t * np.exp(-t**2 / (2*sigma**2))
 
+centro = np.argmax(gauss_derivada)
+mover = QRS//2 - centro
+gauss_centrada = np.roll(gauss_derivada, mover)
+
+h = gauss_centrada[::-1]   
+y = np.convolve(ecg_one_lead, h, mode='same')
+
+max_ecg = np.argmax(ecg_one_lead[0:1000])
+max_conv = np.argmax(y[0:1000])
+
+peaks, props = signal.find_peaks(y,distance=QRS, prominence=np.max(y)*0.39)
 
