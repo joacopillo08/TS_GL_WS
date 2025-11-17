@@ -76,9 +76,9 @@ for SNRdb in [3, 10]:
 
     # FFT 
     matriz_Xn1 = (1/N) * fft(matriz_xn, n = Npadding, axis = 0)
-    matriz_Xn2 = (1/N) * fft(xx_vent_flt, n = Npadding, axis = 0)
-    matriz_Xn3 = (1/N) * fft(xx_vent_bmh, n = Npadding, axis = 0)
-    matriz_Xn4 = (1/N) * fft(xx_vent_hmg, n = Npadding, axis = 0)
+    # matriz_Xn2 = (1/N) * fft(xx_vent_flt, n = Npadding, axis = 0)
+    # matriz_Xn3 = (1/N) * fft(xx_vent_bmh, n = Npadding, axis = 0)
+    # matriz_Xn4 = (1/N) * fft(xx_vent_hmg, n = Npadding, axis = 0)
 
     P_sig = np.mean(matriz_x**2)
     P_n   = np.mean(matriz_ruido**2)

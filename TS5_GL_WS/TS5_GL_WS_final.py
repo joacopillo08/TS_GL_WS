@@ -8,7 +8,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.io as sio
 from scipy import signal as sig
-import mne as mne
+# import mne as mne
+from numpy.fft import fft
 
 
 #ECG CON RUIDO analizado con Welch
@@ -21,13 +22,21 @@ mat_struct = sio.loadmat('./ECG_TP4.mat')
 
 ecg_one_lead = mat_struct['ecg_lead'].flatten()
 N_ecg = len(ecg_one_lead)
+Ts = 1/fs_ecg
 
 cant_promedio = 15
 nperseg = N_ecg // cant_promedio
+freqs = np.fft.fftfreq(N_ecg, Ts)  
 
 #print(nperseg)
 nfft = 2 * nperseg
 win = "flattop"
+
+X1 = fft(ecg_one_lead)
+X1abs = 1/N_ecg * np.abs(X1)
+
+plt.plot(freqs, 10*np.log10( X1abs) ,"--", label = 'dens esp pot fs/4') ##densidad espectral de potencia
+
 
 f_ecg, PSD_ECG_W = sig.welch(ecg_one_lead, fs = fs_ecg, window=win, nperseg = nperseg, nfft = nfft )
 PSD_ECG_dB = 10 * np.log10(PSD_ECG_W)
@@ -38,7 +47,7 @@ plt.title('PSD del ECG con Ruido (Método de Welch)')
 plt.xlabel('Frecuencia (Hz)')
 plt.ylabel('PSD en Decibeles (dB/Hz)')
 plt.grid(True)
-plt.xlim(0,50)
+plt.xlim(0,500)
 plt.tight_layout()
 
 #Pletismografia con Blackman-tukey
@@ -185,36 +194,36 @@ print("BW prueba:", BW_prueba)
 print("BW silbido:", BW_silbido)
 
 
-#BONUS
+# #BONUS
 
-raw = mne.io.read_raw_edf('brux1.edf', preload = True)
+# raw = mne.io.read_raw_edf('brux1.edf', preload = True)
 
-emg = raw.copy().pick_channels(['EMG1-EMG2'])
+# emg = raw.copy().pick_channels(['EMG1-EMG2'])
 
-emg_data = emg.get_data()[0]
-fs_emg = int(emg.info['sfreq'])
-N_emg = len(emg_data)
+# emg_data = emg.get_data()[0]
+# fs_emg = int(emg.info['sfreq'])
+# N_emg = len(emg_data)
 
-cant_promedio_emg = 15
-nperseg_emg = N_emg // cant_promedio_emg
-#nfft_emg = 2 * nperseg
-win_emg = 'hann'
+# cant_promedio_emg = 15
+# nperseg_emg = N_emg // cant_promedio_emg
+# #nfft_emg = 2 * nperseg
+# win_emg = 'hann'
 
-#calculo PSD con WELCH
-f_emg, PSD_EMG_W = sig.welch(emg_data, fs = fs_emg, window = win_emg, nperseg = nperseg_emg)
-PSD_EMG_dB = 10 * np.log10(PSD_EMG_W)
+# #calculo PSD con WELCH
+# f_emg, PSD_EMG_W = sig.welch(emg_data, fs = fs_emg, window = win_emg, nperseg = nperseg_emg)
+# PSD_EMG_dB = 10 * np.log10(PSD_EMG_W)
 
-plt.figure(figsize=(10,5))
-plt.plot(f_emg, PSD_EMG_dB)
-plt.title('PSD de la Señal EMG (Método de Welch)')
-plt.xlabel('Frecuencia (Hz)')
-plt.ylabel('PSD en Decibeles (dB/Hz)')
-plt.grid(True)
-plt.xlim(0,500)  # EMG tiene energía hasta ~450 Hz
-plt.tight_layout()
-plt.show()
+# plt.figure(figsize=(10,5))
+# plt.plot(f_emg, PSD_EMG_dB)
+# plt.title('PSD de la Señal EMG (Método de Welch)')
+# plt.xlabel('Frecuencia (Hz)')
+# plt.ylabel('PSD en Decibeles (dB/Hz)')
+# plt.grid(True)
+# plt.xlim(0,500)  # EMG tiene energía hasta ~450 Hz
+# plt.tight_layout()
+# plt.show()
 
-#calculo BW
-BW_EMG = estimacion_bw (freq = f_emg, PSD = PSD_EMG_W , porcentaje = 0.95)
+# #calculo BW
+# BW_EMG = estimacion_bw (freq = f_emg, PSD = PSD_EMG_W , porcentaje = 0.95)
 
-print("El ancho de banda esencial del EMG es: ", BW_EMG)
+# print("El ancho de banda esencial del EMG es: ", BW_EMG)

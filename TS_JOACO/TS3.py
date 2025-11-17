@@ -52,7 +52,6 @@ plt.grid(True)
 
 plt.plot(freqs, X1abs ,"o", label = "") ##densidad espectral de potencia
 
-
 plt.plot(freqs, 10*np.log10(2* X1abs**2) ,"--", label = 'dens esp pot fs/4') ##densidad espectral de potencia
 plt.plot(freqs, 10*np.log10(2* X2abs**2) ,"--", label = 'dens esp pot fs/4 + 0.25') ##densidad espectral de potencia
 plt.plot(freqs, 20*np.log10(2*X3abs**2) ,"--", label = 'dens esp pot fs/4 + 0.5') ##densidad espectral de potencia
