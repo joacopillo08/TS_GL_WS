@@ -38,10 +38,10 @@ f_aprox = 'butter'
 mi_sos_butter = signal.iirdesign(wp = wp, ws = ws, gpass = alpha_p, gstop = alpha_s, analog = False, ftype = f_aprox, output ='sos', fs=fs) #devuelve dos listas de coeficientes, b para P y a para Q
 f_aprox = 'cheby1'
 mi_sos_cheby1 = signal.iirdesign(wp = wp, ws = ws, gpass = alpha_p, gstop = alpha_s, analog = False, ftype = f_aprox, output ='sos', fs=fs) #devuelve dos listas de coeficientes, b para P y a para Q
-f_aprox = 'cheby2'
-mi_sos_cheby2 = signal.iirdesign(wp = wp, ws = ws, gpass = alpha_p, gstop = alpha_s, analog = False, ftype = f_aprox, output ='sos', fs=fs) #devuelve dos listas de coeficientes, b para P y a para Q
-f_aprox = 'cauer'
-mi_sos_cauer = signal.iirdesign(wp = wp, ws = ws, gpass = alpha_p, gstop = alpha_s, analog = False, ftype = f_aprox, output ='sos', fs=fs) #devuelve dos listas de coeficientes, b para P y a para Q
+# f_aprox = 'cheby2'
+# mi_sos_cheby2 = signal.iirdesign(wp = wp, ws = ws, gpass = alpha_p, gstop = alpha_s, analog = False, ftype = f_aprox, output ='sos', fs=fs) #devuelve dos listas de coeficientes, b para P y a para Q
+# f_aprox = 'cauer'
+# mi_sos_cauer = signal.iirdesign(wp = wp, ws = ws, gpass = alpha_p, gstop = alpha_s, analog = False, ftype = f_aprox, output ='sos', fs=fs) #devuelve dos listas de coeficientes, b para P y a para Q
 
 # %%
 
@@ -54,6 +54,7 @@ w_rad = w / (fs / 2) * np.pi
 gd = -np.diff(fase) / np.diff(w_rad) #retardo de grupo [rad/rad]
 
 z, p, k = signal.sos2zpk(mi_sos_butter) #ubicacion de polos y ceros, z=ubicacion de ceros(=0), p=ubicacion polos, k
+b,a = signal.sos2tf(mi_sos_butter) #ubicacion de polos y ceros, z=ubicacion de ceros(=0), p=ubicacion polos, k
 
 # --- Gráficas ---
 #plt.figure(figsize=(12,10))

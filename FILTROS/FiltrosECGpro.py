@@ -64,21 +64,26 @@ plt.xlabel('Pulsación angular [r/s]')
 plt.ylabel('τg [# muestras]')
 plt.grid(True, which='both', ls=':')
 
-# # Diagrama de polos y ceros
-# plt.subplot(2,2,4)
-# plt.plot(np.real(p), np.imag(p), 'x', markersize=10, label=f'{f_aprox} Polos')
-# if len(z) > 0:
-#     plt.plot(np.real(z), np.imag(z), 'o', markersize=10, fillstyle='none', label=f'{f_aprox} Ceros')
-# plt.axhline(0, color='k', lw=0.5)
-# plt.axvline(0, color='k', lw=0.5)
-# plt.title('Diagrama de Polos y Ceros (plano z)')
-# plt.xlabel('σ [rad/s]')
-# plt.ylabel('jω [rad/s]')
-# plt.legend()
-# plt.grid(True)
+# Diagrama de polos y ceros
+plt.figure()
+theta = np.linspace(0, 2*np.pi, 500)
+plt.plot(np.cos(theta), np.sin(theta), '--', color='gray', linewidth=1)  # circunferencia unidad
 
-# plt.tight_layout()
-# plt.show()
+plt.plot(np.real(p), np.imag(p), 'x', markersize=10, label=f'{f_aprox} Polos')
+if len(z) > 0:
+    plt.plot(np.real(z), np.imag(z), 'o', markersize=10, fillstyle='none', label=f'{f_aprox} Ceros')
+
+plt.axhline(0, color='k', lw=0.5)
+plt.axvline(0, color='k', lw=0.5)
+plt.title('Diagrama de Polos y Ceros (plano z)')
+plt.xlabel('Re')
+plt.ylabel('Im')
+plt.legend()
+plt.grid(True)
+plt.gca().set_aspect('equal')
+
+plt.tight_layout()
+plt.show()
 
 # %% Gráfico adicional del plano Z con círculo unitario
 

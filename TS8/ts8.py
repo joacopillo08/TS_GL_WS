@@ -120,7 +120,8 @@ def filtrar_IIR_ECG(mi_sos, nombre_filtro, ecg=ecg_one_lead, fs=fs_ecg):
        
         plt.figure()
         plt.plot(zoom_region, ecg[zoom_region], label='ECG', linewidth=2)
-        plt.plot(zoom_region, ecg_filt[zoom_region], label=nombre_filtro)
+        plt.plot(zoom_region, ecg_filt[zoom_region], label='Butterworth')
+        #plt.plot(zoom_region, ECG_f_win[zoom_region + demora], label='FIR Window')
        
         plt.title('ECG sin ruido desde ' + str(ii[0]) + ' to ' + str(ii[1]) )
         plt.ylabel('Adimensional')
@@ -149,7 +150,7 @@ def filtrar_IIR_ECG(mi_sos, nombre_filtro, ecg=ecg_one_lead, fs=fs_ecg):
        
         plt.figure()
         plt.plot(zoom_region, ecg[zoom_region], label='ECG', linewidth=2)
-        plt.plot(zoom_region, ecg_filt[zoom_region], label=nombre_filtro)
+        plt.plot(zoom_region, ecg_filt[zoom_region], label='Butterworth')
         # plt.plot(zoom_region, ECG_f_win[zoom_region + demora], label='FIR Window')
        
         plt.title('ECG con ruido desde ' + str(ii[0]) + ' to ' + str(ii[1]) )
@@ -179,7 +180,7 @@ for tipo, sos in IIR.items():
 
 fs = 1000
 wp = (0.95, 35) #freq de corte/paso (rad/s)
-ws = (0.14, 35.7) #freq de stop/detenida (rad/s) ###VEEEEEERRRRRR clase del otro dia##########
+ws = (0.14, 37.5) #freq de stop/detenida (rad/s) ###VEEEEEERRRRRR clase del otro dia##########
 
 #si alpha_p es =3 -> max atenuacion, butter
 
@@ -194,7 +195,7 @@ def filtro_FIR(fs, wp, ws, alpha_p, alpha_s, metodo='firwin2'):
     frecuencias = [0, ws[0], wp[0], wp[1], ws[1], fs/2]
 
     deseado = [0,0,1,1,0,0]
-    cant_coef = 2001
+    cant_coef = 2001 if metodo == 'firwin2' else 1999  # impar para fase lineal
     retardo = (cant_coef-1)//2 
     peso = [12,4,4]
 
@@ -254,15 +255,15 @@ def filtrar_FIR_ECG(b, nombre_filtro, ecg, fs, retardo):
 
     ecg_filt = signal.lfilter(b = b, a = 1, x = ecg)
 
-    plt.figure()
-    plt.plot(ecg, label='ECG crudo', alpha=0.7)
-    plt.plot(ecg_filt, label=f'Filtrado ({nombre_filtro})', linewidth=1.2)
-    plt.title(f'ECG completo - {nombre_filtro}')
-    plt.xlabel('Muestras (#)')
-    plt.ylabel('Amplitud')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
+    # plt.figure()
+    # plt.plot(ecg, label='ECG crudo', alpha=0.7)
+    # plt.plot(ecg_filt, label=f'Filtrado ({nombre_filtro})', linewidth=1.2)
+    # plt.title(f'ECG completo - {nombre_filtro}')
+    # plt.xlabel('Muestras (#)')
+    # plt.ylabel('Amplitud')
+    # plt.legend()
+    # plt.grid(True)
+    # plt.show()
 
     #################################
     # Regiones de interés sin ruido #
@@ -270,58 +271,58 @@ def filtrar_FIR_ECG(b, nombre_filtro, ecg, fs, retardo):
     
     cant_muestras = len(ecg_one_lead)
     
-    regs_interes = (
-            [4000, 5500], # muestras
-            [10e3, 11e3], # muestras
-            )
+    # regs_interes = (
+    #         [4000, 5500], # muestras
+    #         [10e3, 11e3], # muestras
+    #         )
      
-    for ii in regs_interes:
+    # for ii in regs_interes:
        
-        # intervalo limitado de 0 a cant_muestras
-        zoom_region = np.arange(np.max([0, ii[0]]), np.min([cant_muestras, ii[1]]), dtype='uint')
+    #     # intervalo limitado de 0 a cant_muestras
+    #     zoom_region = np.arange(np.max([0, ii[0]]), np.min([cant_muestras, ii[1]]), dtype='uint')
        
-        plt.figure()
-        plt.plot(zoom_region, ecg[zoom_region], label='ECG', linewidth=2)
-        plt.plot(zoom_region, ecg_filt[zoom_region + retardo], label=nombre_filtro)
+    #     plt.figure()
+    #     plt.plot(zoom_region, ecg[zoom_region], label='ECG', linewidth=2)
+    #     plt.plot(zoom_region, ecg_filt[zoom_region + retardo], label=nombre_filtro)
 
-        plt.title('ECG sin ruido desde ' + str(ii[0]) + ' to ' + str(ii[1]) )
-        plt.ylabel('Adimensional')
-        plt.xlabel('Muestras (#)')
+    #     plt.title('ECG sin ruido desde ' + str(ii[0]) + ' to ' + str(ii[1]) )
+    #     plt.ylabel('Adimensional')
+    #     plt.xlabel('Muestras (#)')
        
-        axes_hdl = plt.gca()
-        axes_hdl.legend()
-        axes_hdl.set_yticks(())
+    #     axes_hdl = plt.gca()
+    #     axes_hdl.legend()
+    #     axes_hdl.set_yticks(())
                
-        plt.show()
+    #     plt.show()
      
-    #################################
-    # Regiones de interés con ruido #
-    #################################
+    # #################################
+    # # Regiones de interés con ruido #
+    # #################################
      
-    regs_interes = (
-            np.array([5, 5.2]) *60*fs, # minutos a muestras
-            np.array([12, 12.4]) *60*fs, # minutos a muestras
-            np.array([15, 15.2]) *60*fs, # minutos a muestras
-            )
+    # regs_interes = (
+    #         np.array([5, 5.2]) *60*fs, # minutos a muestras
+    #         np.array([12, 12.4]) *60*fs, # minutos a muestras
+    #         np.array([15, 15.2]) *60*fs, # minutos a muestras
+    #         )
      
-    for ii in regs_interes:
+    # for ii in regs_interes:
        
-        # intervalo limitado de 0 a cant_muestras
-        zoom_region = np.arange(np.max([0, ii[0]]), np.min([cant_muestras, ii[1]]), dtype='uint')
+    #     # intervalo limitado de 0 a cant_muestras
+    #     zoom_region = np.arange(np.max([0, ii[0]]), np.min([cant_muestras, ii[1]]), dtype='uint')
        
-        plt.figure()
-        plt.plot(zoom_region, ecg[zoom_region], label='ECG', linewidth=2)
-        plt.plot(zoom_region, ecg_filt[zoom_region + retardo], label='FIR Window')
+    #     plt.figure()
+    #     plt.plot(zoom_region, ecg[zoom_region], label='ECG', linewidth=2)
+    #     plt.plot(zoom_region, ecg_filt[zoom_region + retardo], label='FIR Window')
        
-        plt.title('ECG con ruido desde ' + str(ii[0]) + ' to ' + str(ii[1]) )
-        plt.ylabel('Adimensional')
-        plt.xlabel('Muestras (#)')
+    #     plt.title('ECG con ruido desde ' + str(ii[0]) + ' to ' + str(ii[1]) )
+    #     plt.ylabel('Adimensional')
+    #     plt.xlabel('Muestras (#)')
        
-        axes_hdl = plt.gca()
-        axes_hdl.legend()
-        axes_hdl.set_yticks(())
+    #     axes_hdl = plt.gca()
+    #     axes_hdl.legend()
+    #     axes_hdl.set_yticks(())
                
-        plt.show()
+    #     plt.show()
     
 # --- Loop para comparar FIRs ---
 FIR = {}
