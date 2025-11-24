@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy.io as sio
 from scipy import signal as sig
-import mne as mne
+# import mne as mne
 
 
 #ECG CON RUIDO analizado con Welch
@@ -185,36 +185,36 @@ print("BW prueba:", BW_prueba)
 print("BW silbido:", BW_silbido)
 
 
-#BONUS
+# #BONUS
 
-raw = mne.io.read_raw_edf('brux1.edf', preload = True)
+# raw = mne.io.read_raw_edf('brux1.edf', preload = True)
 
-emg = raw.copy().pick_channels(['EMG1-EMG2'])
+# emg = raw.copy().pick_channels(['EMG1-EMG2'])
 
-emg_data = emg.get_data()[0]
-fs_emg = int(emg.info['sfreq'])
-N_emg = len(emg_data)
+# emg_data = emg.get_data()[0]
+# fs_emg = int(emg.info['sfreq'])
+# N_emg = len(emg_data)
 
-cant_promedio_emg = 15
-nperseg_emg = N_emg // cant_promedio_emg
-#nfft_emg = 2 * nperseg
-win_emg = 'hann'
+# cant_promedio_emg = 15
+# nperseg_emg = N_emg // cant_promedio_emg
+# #nfft_emg = 2 * nperseg
+# win_emg = 'hann'
 
-#calculo PSD con WELCH
-f_emg, PSD_EMG_W = sig.welch(emg_data, fs = fs_emg, window = win_emg, nperseg = nperseg_emg)
-PSD_EMG_dB = 10 * np.log10(PSD_EMG_W)
+# #calculo PSD con WELCH
+# f_emg, PSD_EMG_W = sig.welch(emg_data, fs = fs_emg, window = win_emg, nperseg = nperseg_emg)
+# PSD_EMG_dB = 10 * np.log10(PSD_EMG_W)
 
-plt.figure(figsize=(10,5))
-plt.plot(f_emg, PSD_EMG_dB)
-plt.title('PSD de la Señal EMG (Método de Welch)')
-plt.xlabel('Frecuencia (Hz)')
-plt.ylabel('PSD en Decibeles (dB/Hz)')
-plt.grid(True)
-plt.xlim(0,500)  # EMG tiene energía hasta ~450 Hz
-plt.tight_layout()
-plt.show()
+# plt.figure(figsize=(10,5))
+# plt.plot(f_emg, PSD_EMG_dB)
+# plt.title('PSD de la Señal EMG (Método de Welch)')
+# plt.xlabel('Frecuencia (Hz)')
+# plt.ylabel('PSD en Decibeles (dB/Hz)')
+# plt.grid(True)
+# plt.xlim(0,500)  # EMG tiene energía hasta ~450 Hz
+# plt.tight_layout()
+# plt.show()
 
-#calculo BW
-BW_EMG = estimacion_bw (freq = f_emg, PSD = PSD_EMG_W , porcentaje = 0.95)
+# #calculo BW
+# BW_EMG = estimacion_bw (freq = f_emg, PSD = PSD_EMG_W , porcentaje = 0.95)
 
-print("El ancho de banda esencial del EMG es: ", BW_EMG)
+# print("El ancho de banda esencial del EMG es: ", BW_EMG)
