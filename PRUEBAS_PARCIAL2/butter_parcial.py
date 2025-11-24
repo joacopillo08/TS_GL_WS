@@ -9,8 +9,8 @@ k = np.sqrt(10)
 # Qp = 1.0
 f_aprox = 'butter'
 # coeficientes analógicos normalizados
-b = [1,0,1]## s^2+2^2  RADIO CEROS = 2          
-a = [1,1,1]  ## s^2+sqrt(2).2+2^2   Q = 1/sqrt(2), w0 = 2 *np.sqrt(2) 
+b = [1,0,4]## s^2+2^2  RADIO CEROS = 2          
+a = [1,2*np.sqrt(2),4]  ## s^2+sqrt(2).2+2^2   Q = 1/sqrt(2), w0 = 2 *np.sqrt(2) 
 
 # Barrido de pulsaciones
 w = np.logspace(-2, 2, 1000)  # 0.01 a 100 rad/s aprox
@@ -81,7 +81,7 @@ plt.show()
 
 
 # %% punto b
-fs = 1.20
+fs = 1
 num, den = signal.bilinear(b, a, fs)
 
 wz, hz= signal.freqz(num, den, worN = np.logspace(-2, 1.9, 1000), fs = fs) #calcula rta en frq del filtro, devuelve w y vector de salida (h es numero complejo)
@@ -133,13 +133,13 @@ plt.ylabel('Fase [°]')
 plt.grid(True, which='both', ls=':')
 plt.figure()
 
-# # Retardo de grupo
-# plt.subplot(2,2,3)
-# plt.plot(wz[:-1], gdz)
-# plt.title('Retardo de Grupo ')
-# plt.xlabel('Pulsación angular [r/s]')
-# plt.ylabel('τg [# muestras]')
-# plt.grid(True, which='both', ls=':')
+# Retardo de grupo
+plt.subplot(2,2,3)
+plt.plot(wz[:-1], gdz)
+plt.title('Retardo de Grupo ')
+plt.xlabel('Pulsación angular [r/s]')
+plt.ylabel('τg [# muestras]')
+plt.grid(True, which='both', ls=':')
 
 
 
