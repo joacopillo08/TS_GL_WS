@@ -227,7 +227,7 @@ h = h[10:110]
 
 y = np.convolve(ecg_one_lead, h, mode='same')
 
-peaks, _ = signal.find_peaks(y,distance=QRS, prominence=np.max(y)*0.39)
+peaks, _ = signal.find_peaks(y,distance=QRS, prominence=np.max(y)*0.38)
 
 ###################################
 # Gráfico de la plantilla
